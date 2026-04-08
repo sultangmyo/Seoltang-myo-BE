@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: sugarcat
+
+  profiles:
+    active: local
+    include: secret
+
+  # JPA 공통
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+# 서버 설정
+server:
+  port: 8080
+
+# 로깅
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
