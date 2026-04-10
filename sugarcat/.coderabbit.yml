@@ -1,6 +1,3 @@
-# CodeRabbit 설정 파일
-# https://docs.coderabbit.ai/getting-started/configure-coderabbit
-
 language: "ko-KR"
 
 reviews:
@@ -38,7 +35,6 @@ reviews:
     - "!**/.gitignore"
     - "!**/gradlew"
     - "!**/gradlew.bat"
-    - "!**/*.yml"
     - "!**/application-secret.yml"
 
   # 리뷰 지침 (프로젝트 컨벤션)
