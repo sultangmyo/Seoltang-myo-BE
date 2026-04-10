@@ -1,0 +1,68 @@
+language: "ko-KR"
+
+reviews:
+  # PR 리뷰 활성화
+  enabled: true
+
+  # 리뷰 프로필: assertive(엄격), chill(관대)
+  profile: "assertive"
+
+  # 리뷰 요청 시에만 리뷰 (false: PR 오픈 시 자동 리뷰)
+  request_changes_workflow: false
+
+  # 고수준 요약 댓글 작성
+  high_level_summary: true
+
+  # PR 제목에 대한 리뷰 포함
+  poem: false
+
+  # 리뷰할 때 변경 사항 요약 포함
+  collapse_walkthrough: false
+
+  # 자동 리뷰 트리거
+  auto_review:
+    enabled: true
+    # 드래프트 PR은 리뷰하지 않음
+    drafts: false
+    # 베이스 브랜치 패턴
+    base_branches:
+      - "main"
+      - "develop"
+
+  # 리뷰에서 제외할 파일 패턴
+  path_filters:
+    - "!**/*.md"
+    - "!**/.gitignore"
+    - "!**/gradlew"
+    - "!**/gradlew.bat"
+    - "!**/application-secret.yml"
+
+  # 리뷰 지침 (프로젝트 컨벤션)
+  path_instructions:
+    - path: "src/main/java/**/*.java"
+      instructions: |
+        - Spring Boot 4.x + Java 17 프로젝트입니다.
+        - Lombok 어노테이션(@Getter, @Builder, @RequiredArgsConstructor 등) 사용 여부를 확인해주세요.
+        - JPA Entity는 @Entity, @Table, @Id, @GeneratedValue 등 어노테이션이 올바르게 적용되어 있는지 확인해주세요.
+        - 영속성 컨텍스트 관련 이슈(LazyInitializationException, N+1 문제 등)를 검토해주세요.
+        - 서비스 레이어에 @Transactional 어노테이션이 적절히 적용되어 있는지 확인해주세요.
+        - 컨트롤러는 비즈니스 로직 없이 요청/응답 처리만 담당하도록 확인해주세요.
+        - DTO와 Entity 간 변환 로직이 적절한지 확인해주세요.
+        - 예외 처리 및 에러 응답 형식이 일관적인지 확인해주세요.
+    - path: "src/main/java/**/entity/*.java"
+      instructions: |
+        - Entity 클래스는 불필요한 setter를 노출하지 않도록 확인해주세요.
+        - 연관관계 매핑(OneToMany, ManyToOne 등)의 방향과 cascade 설정이 올바른지 검토해주세요.
+    - path: "src/main/java/**/controller/*.java"
+      instructions: |
+        - RESTful API 설계 원칙을 따르는지 확인해주세요.
+        - 요청 파라미터 유효성 검사(@Valid, @NotNull 등)가 적용되어 있는지 확인해주세요.
+        - HTTP 상태 코드가 적절히 반환되는지 확인해주세요.
+    - path: "src/test/java/**/*.java"
+      instructions: |
+        - 테스트 커버리지가 핵심 비즈니스 로직을 포함하는지 확인해주세요.
+        - 단위 테스트와 통합 테스트가 적절히 구분되어 있는지 확인해주세요.
+
+chat:
+  # 이슈/PR 댓글에서 CodeRabbit과 채팅 활성화
+  auto_reply: true
