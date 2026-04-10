@@ -1,7 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sultangmyo
+    url: jdbc:postgresql://localhost:5432/sugarcat
+    username: postgres
+    password: pg1234
     driver-class-name: org.postgresql.Driver
+
+  sql:
+    init:
+      mode: never # schema.sql 처음 초기화는 수동으로
 
   jpa:
     hibernate:
