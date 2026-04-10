@@ -53,7 +53,6 @@ reviews:
       instructions: |
         - Entity 클래스는 불필요한 setter를 노출하지 않도록 확인해주세요.
         - 연관관계 매핑(OneToMany, ManyToOne 등)의 방향과 cascade 설정이 올바른지 검토해주세요.
-        - BaseEntity 상속 여부 및 공통 필드(createdAt, updatedAt) 관리를 확인해주세요.
     - path: "src/main/java/**/controller/*.java"
       instructions: |
         - RESTful API 설계 원칙을 따르는지 확인해주세요.
