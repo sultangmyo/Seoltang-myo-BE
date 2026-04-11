@@ -26,13 +26,13 @@ public class Cat {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @Column(name = "birth_date", nullable = true)
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
     @Column(name = "diagnosed_date", nullable = false)
     private LocalDate diagnoseDate;
 
-    @Column(name = "invite_code", length = 50, nullable = true)
+    @Column(name = "invite_code", length = 50)
     private String inviteCode;
 
     //2명 이상의 user 받아옴
