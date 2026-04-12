@@ -4,34 +4,48 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: sugarcat-app
-    ports:
-      - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sugarcat
-      SPRING_DATASOURCE_USERNAME: sugarcat-user
-      SPRING_DATASOURCE_PASSWORD: sugarcat1234
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      SERVER_PORT: ${SERVER_PORT:-8080}
+
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-1800000}
+      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-1209600000}
     networks:
       - app-net
 
   postgres:
-    image: postgres:18
+    image: postgres:16
     container_name: sugarcat-postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: sugarcat
-      POSTGRES_USER: sugarcat-user
-      POSTGRES_PASSWORD: sugarcat1234
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-net
 
-networks:
-  app-net:
-
 volumes:
   postgres_data:
+
+networks:
+  app-net:
