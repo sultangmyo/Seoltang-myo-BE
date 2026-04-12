@@ -37,7 +37,7 @@ CREATE TABLE cats
     id             UUID PRIMARY KEY,
     name           VARCHAR(50) NOT NULL,
     birth_date     DATE, -- 예시) YYYY-MM-DD
-    diagnosed_date DATE        NOT NULL DEFAULT CURRENT_DATE,
+    diagnosed_date DATE        NOT NULL,
     invite_code    VARCHAR(50) UNIQUE
 );
 

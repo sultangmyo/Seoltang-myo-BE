@@ -36,7 +36,7 @@ public class InsulinRecord {
     private int sequence;
 
     @Column(name = "is_injected", nullable = false)
-    private Boolean isInjected = false;
+    private boolean isInjected = false;
 
 
 }

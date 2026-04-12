@@ -25,7 +25,7 @@ public class CatCareSetting {
     @Column(name = "id")
     private UUID catCareSettingId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id", nullable = false)
     private Cat cat;
 

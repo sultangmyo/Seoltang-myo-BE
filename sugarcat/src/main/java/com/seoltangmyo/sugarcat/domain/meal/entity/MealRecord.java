@@ -5,6 +5,7 @@ import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "meal_records")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class MealRecord {
