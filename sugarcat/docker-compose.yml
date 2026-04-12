@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sugarcat-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sugarcat
+      SPRING_DATASOURCE_USERNAME: sugarcat-user
+      SPRING_DATASOURCE_PASSWORD: sugarcat1234
+    networks:
+      - app-net
+
+  postgres:
+    image: postgres:18
+    container_name: sugarcat-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: sugarcat
+      POSTGRES_USER: sugarcat-user
+      POSTGRES_PASSWORD: sugarcat1234
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - app-net
+
+networks:
+  app-net:
+
+volumes:
+  postgres_data:
