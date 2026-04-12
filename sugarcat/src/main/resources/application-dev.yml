@@ -1,13 +1,14 @@
+# 도커 설정이므로 도커 사용하실때는 로컬 postgreSQL이 5432 포트 사용중이진 않은지 확인하고 올려주세요!
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sugarcat
-    username: postgres
-    password: pg1234
+    url: jdbc:postgresql://postgres:5432/sugarcat
+    username: sugarcat-user
+    password: sugarcat1234
     driver-class-name: org.postgresql.Driver
 
   sql:
     init:
-      mode: never # schema.sql 처음 초기화는 수동으로
+      mode: never
 
   jpa:
     hibernate:
