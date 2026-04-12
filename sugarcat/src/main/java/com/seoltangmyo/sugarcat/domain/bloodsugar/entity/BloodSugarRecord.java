@@ -1,11 +1,10 @@
-package com.seoltangmyo.sugarcat.domain.meal.entity;
+package com.seoltangmyo.sugarcat.domain.bloodsugar.entity;
 
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -13,19 +12,18 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "meal_records")
-@Getter
+@Table(name = "blood_sugar_records")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class MealRecord {
+public class BloodSugarRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID mealRecordId;
+    private UUID bloodSugarRecordId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cat_id", nullable = false)
+    @JoinColumn(name = "cat_id",nullable = false)
     private Cat cat;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,10 +39,12 @@ public class MealRecord {
     @Column(name = "sequence", nullable = false)
     private int sequence;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "meal_status", length = 20, nullable = false)
-    private MealStatus mealStatus;
+    @Column(name = "sugar_value", nullable = false)
+    private int sugarValue;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sugar_status", length = 20, nullable = false)
+    private SugarStatus sugarStatus;
 
 
 
