@@ -40,8 +40,3 @@ out/
 .DS_Store
 .AppleDouble
 .LSOverride
-
-### env ###
-.env
-.env.*
-!.env.example
