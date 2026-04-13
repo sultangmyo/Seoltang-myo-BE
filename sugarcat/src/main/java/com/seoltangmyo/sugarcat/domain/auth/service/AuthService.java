@@ -29,7 +29,7 @@ public class AuthService {
     public SocialLoginResponse appleLogin(AppleLoginRequest request) {
         String identityToken = request.identityToken(); // 프론트가 보낸 Apple identity token
 
-        // TODO: Apple JWKS 검증 후 sub 추출
+        // Apple JWKS 검증 후 sub 추출
         String providerId = extractAppleProviderId(identityToken); // Apple의 고유 식별값(sub)
 
         return loginOrSignUp(APPLE, providerId); // 기존 유저 조회 또는 신규 판단 후 토큰 발급
@@ -39,7 +39,7 @@ public class AuthService {
     public SocialLoginResponse kakaoLogin(KakaoLoginRequest request) {
         String kakaoAccessToken = request.accessToken(); // 프론트가 보낸 카카오 access token
 
-        // TODO: 카카오 API 호출 후 user id 추출
+        // 카카오 API 호출 후 user id 추출
         String providerId = extractKakaoProviderId(kakaoAccessToken); // 카카오의 고유 식별값(id)
 
         return loginOrSignUp(KAKAO, providerId); // 기존 유저 조회 또는 신규 판단 후 토큰 발급
@@ -111,13 +111,13 @@ public class AuthService {
     }
 
     private String extractAppleProviderId(String identityToken) {
-        // TODO: Apple identity token 검증 후 sub 반환
+        // Apple identity token 검증 후 sub 반환
         // 지금은 임시 예시
         throw new UnsupportedOperationException("Apple 로그인 검증 로직을 아직 구현하지 않았습니다.");
     }
 
     private String extractKakaoProviderId(String kakaoAccessToken) {
-        // TODO: 카카오 사용자 정보 API 호출 후 id 반환
+        // 카카오 사용자 정보 API 호출 후 id 반환
         // 지금은 임시 예시
         throw new UnsupportedOperationException("Kakao 로그인 검증 로직을 아직 구현하지 않았습니다.");
     }

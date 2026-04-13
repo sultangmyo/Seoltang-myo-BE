@@ -40,7 +40,6 @@ public class User {
 
 
     // JWT + 소셜 로그인
-    // TODO: 스키마에 추가해야함.
 
     @Column(name = "provider", nullable = false, length = 20)
     private String provider; // APPLE, KAKAO
