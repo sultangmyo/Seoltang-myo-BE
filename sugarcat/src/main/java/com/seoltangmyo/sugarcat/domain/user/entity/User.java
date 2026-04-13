@@ -41,8 +41,9 @@ public class User {
 
     // JWT + 소셜 로그인
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false, length = 20)
-    private String provider; // APPLE, KAKAO
+    private ProviderType provider; // APPLE, KAKAO
 
     @Column(name = "provider_id", nullable = false, length = 100)
     private String providerId; // 애플 sub, 카카오 user id
