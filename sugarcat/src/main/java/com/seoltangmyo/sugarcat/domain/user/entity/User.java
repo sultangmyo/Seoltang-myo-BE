@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -38,9 +39,31 @@ public class User {
     private boolean mealNotiEnabled;
 
 
+    // JWT + 소셜 로그인
+    // TODO: 스키마에 추가해야함.
+
+    @Column(name = "provider", nullable = false, length = 20)
+    private String provider; // APPLE, KAKAO
+
+    @Column(name = "provider_id", nullable = false, length = 100)
+    private String providerId; // 애플 sub, 카카오 user id
+
+    @Column(name = "refresh_token", length = 500)
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expires_at")
+    private LocalDateTime refreshTokenExpiresAt;
 
 
+    // 비즈니스 메서드
 
+    public void updateRefreshToken(String refreshToken, LocalDateTime expiresAt) {
+        this.refreshToken = refreshToken;
+        this.refreshTokenExpiresAt = expiresAt;
+    }
 
-
+    public void clearRefreshToken() {
+        this.refreshToken = null;
+        this.refreshTokenExpiresAt = null;
+    }
 }
