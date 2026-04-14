@@ -3,6 +3,9 @@ tone_instructions: "모든 리뷰는 반드시 한국어로 작성해주세요."
 
 reviews:
 
+  # 전체 리뷰 언어 지침
+  instructions: "모든 리뷰 코멘트와 요약은 반드시 한국어로 작성해주세요."
+
   # 리뷰 프로필: assertive(엄격), chill(관대)
   profile: "assertive"
 
