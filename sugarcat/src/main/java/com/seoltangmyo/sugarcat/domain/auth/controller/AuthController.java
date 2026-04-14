@@ -28,7 +28,7 @@ public class AuthController {
             @RequestBody AppleLoginRequest request
     ) {
         SocialLoginResponse response = authService.appleLogin(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/kakao")
