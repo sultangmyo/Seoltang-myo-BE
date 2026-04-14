@@ -1,10 +1,8 @@
 language: "ko-KR"
-tone_instructions: "모든 리뷰는 반드시 한국어로 작성해주세요."
 
 reviews:
-
-  # 전체 리뷰 언어 지침
-  instructions: "모든 리뷰 코멘트와 요약은 반드시 한국어로 작성해주세요."
+  # PR 리뷰 활성화
+  enabled: true
 
   # 리뷰 프로필: assertive(엄격), chill(관대)
   profile: "assertive"
@@ -15,6 +13,10 @@ reviews:
   # 고수준 요약 댓글 작성
   high_level_summary: true
 
+  instructions: |
+    - 모든 리뷰는 반드시 한국어로 작성해주세요.
+    - 초보 개발자를 기준으로 쉽게 설명해주세요.
+
   # PR 제목에 대한 리뷰 포함
   poem: false
 
@@ -23,6 +25,7 @@ reviews:
 
   # 자동 리뷰 트리거
   auto_review:
+    enabled: true
     # 드래프트 PR은 리뷰하지 않음
     drafts: false
     # 베이스 브랜치 패턴
