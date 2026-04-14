@@ -45,3 +45,6 @@ out/
 .env
 .env.*
 !.env.example
+
+### study ###
+**/.study/
