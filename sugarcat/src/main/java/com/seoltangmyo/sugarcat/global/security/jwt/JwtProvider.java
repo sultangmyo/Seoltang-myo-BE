@@ -17,9 +17,15 @@ public class JwtProvider {
 
     public JwtProvider(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
-        this.secretKey = Keys.hmacShaKeyFor(
-                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
-        );
+        String secret = jwtProperties.getSecret();
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("jwt.secret must not be blank");
+        }
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 32) { // HS256 minimum: 32 bytes
+            throw new IllegalStateException("jwt.secret must be at least 32 bytes for HS256");
+        }
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String createAccessToken(UUID userId) {
@@ -62,14 +68,24 @@ public class JwtProvider {
 
     public LocalDateTime getExpiration(String token) {
         Date exp = parse(token).getExpiration();
-        return exp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return exp.toInstant()
+                .atOffset(ZoneOffset.UTC)
+                .toLocalDateTime();
     }
 
-    private Claims parse(String token) {
+    public Claims parse(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public UUID getUserId(Claims claims) {
+        return UUID.fromString(claims.getSubject());
+    }
+
+    public String getType(Claims claims) {
+        return claims.get("type", String.class);
     }
 }
