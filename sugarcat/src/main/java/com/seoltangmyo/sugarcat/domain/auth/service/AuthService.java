@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Service
@@ -69,7 +70,7 @@ public class AuthService {
             throw new IllegalArgumentException("Refresh Token이 일치하지 않습니다.");
         }
 
-        if (user.getRefreshTokenExpiresAt() == null || user.getRefreshTokenExpiresAt().isBefore(LocalDateTime.now())) {
+        if (user.getRefreshTokenExpiresAt() == null || user.getRefreshTokenExpiresAt().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
             throw new IllegalArgumentException("Refresh Token이 만료되었습니다.");
         }
 
