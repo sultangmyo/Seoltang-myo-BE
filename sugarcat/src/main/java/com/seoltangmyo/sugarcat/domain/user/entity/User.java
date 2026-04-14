@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -52,12 +52,12 @@ public class User {
     private String refreshToken;
 
     @Column(name = "refresh_token_expires_at")
-    private LocalDateTime refreshTokenExpiresAt;
+    private Instant refreshTokenExpiresAt;
 
 
     // 비즈니스 메서드
 
-    public void updateRefreshToken(String refreshToken, LocalDateTime expiresAt) {
+    public void updateRefreshToken(String refreshToken, Instant expiresAt) {
         this.refreshToken = refreshToken;
         this.refreshTokenExpiresAt = expiresAt;
     }

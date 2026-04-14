@@ -61,7 +61,7 @@ CREATE TABLE users
     provider                         VARCHAR(20) NOT NULL,
     provider_id                      VARCHAR(100) NOT NULL,
     refresh_token                    VARCHAR(500),
-    refresh_token_expires_at         DATE,
+    refresh_token_expires_at         TIMESTAMPZ,
 
     CONSTRAINT fk_users_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)

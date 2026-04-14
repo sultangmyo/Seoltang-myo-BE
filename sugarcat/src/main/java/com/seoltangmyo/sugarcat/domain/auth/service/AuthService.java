@@ -13,8 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -70,7 +69,7 @@ public class AuthService {
             throw new IllegalArgumentException("Refresh Token이 일치하지 않습니다.");
         }
 
-        if (user.getRefreshTokenExpiresAt() == null || user.getRefreshTokenExpiresAt().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+        if (user.getRefreshTokenExpiresAt() == null || user.getRefreshTokenExpiresAt().isBefore(Instant.now())) {
             throw new IllegalArgumentException("Refresh Token이 만료되었습니다.");
         }
 
@@ -105,7 +104,7 @@ public class AuthService {
 
         String accessToken = jwtProvider.createAccessToken(user.getUserId()); // Access Token 발급
         String refreshToken = jwtProvider.createRefreshToken(user.getUserId()); // Refresh Token 발급
-        LocalDateTime refreshTokenExpiresAt = jwtProvider.getExpiration(refreshToken); // Refresh Token 만료 시각 계산
+        Instant refreshTokenExpiresAt = jwtProvider.getExpiration(refreshToken); // Refresh Token 만료 시각 계산
 
         user.updateRefreshToken(refreshToken, refreshTokenExpiresAt); // DB에 Refresh Token 저장
 

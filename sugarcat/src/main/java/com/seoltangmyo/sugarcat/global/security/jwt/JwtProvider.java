@@ -66,11 +66,8 @@ public class JwtProvider {
         }
     }
 
-    public LocalDateTime getExpiration(String token) {
-        Date exp = parse(token).getExpiration();
-        return exp.toInstant()
-                .atOffset(ZoneOffset.UTC)
-                .toLocalDateTime();
+    public Instant getExpiration(String token) {
+        return parse(token).getExpiration().toInstant();
     }
 
     public Claims parse(String token) {
