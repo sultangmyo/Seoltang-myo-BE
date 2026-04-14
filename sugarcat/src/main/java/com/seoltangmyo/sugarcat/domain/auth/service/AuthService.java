@@ -5,6 +5,7 @@ import com.seoltangmyo.sugarcat.domain.auth.dto.AppleLoginRequest;
 import com.seoltangmyo.sugarcat.domain.auth.dto.KakaoLoginRequest;
 import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
+import com.seoltangmyo.sugarcat.domain.user.entity.ProviderType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import com.seoltangmyo.sugarcat.global.security.jwt.JwtProvider;
@@ -19,8 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static final String APPLE = "APPLE"; // Apple provider 이름
-    private static final String KAKAO = "KAKAO"; // Kakao provider 이름
+    private static final ProviderType APPLE = ProviderType.APPLE;
+    private static final ProviderType KAKAO = ProviderType.KAKAO;
 
     private final UserRepository userRepository; // 유저 조회/저장용 리포지토리
     private final JwtProvider jwtProvider; // JWT 생성/검증 도구
@@ -86,7 +87,7 @@ public class AuthService {
     }
 
     @Transactional
-    protected SocialLoginResponse loginOrSignUp(String provider, String providerId) {
+    protected SocialLoginResponse loginOrSignUp(ProviderType provider, String providerId) {
         User user = userRepository.findByProviderAndProviderId(provider, providerId)
                 .orElse(null); // provider + providerId 조합으로 기존 유저 조회
 
