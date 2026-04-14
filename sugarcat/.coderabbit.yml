@@ -23,7 +23,6 @@ reviews:
 
   # 자동 리뷰 트리거
   auto_review:
-    enabled: true
     # 드래프트 PR은 리뷰하지 않음
     drafts: false
     # 베이스 브랜치 패턴
