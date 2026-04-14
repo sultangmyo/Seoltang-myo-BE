@@ -4,6 +4,6 @@ package com.seoltangmyo.sugarcat.domain.auth.dto;
 public record SocialLoginResponse (
         String accessToken,
         String refreshToken,
-        boolean isNewUser // api 명세에 없으나 필요하다고 판단
+        boolean isNewUser
 ){
 }
