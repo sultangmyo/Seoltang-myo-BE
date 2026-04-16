@@ -1,12 +1,18 @@
 package com.seoltangmyo.sugarcat.domain.auth.controller;
 
+import com.seoltangmyo.sugarcat.domain.auth.dto.AppleLoginRequest;
+import com.seoltangmyo.sugarcat.domain.auth.dto.KakaoLoginRequest;
+import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
+import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
+import com.seoltangmyo.sugarcat.domain.auth.service.AuthService;
+import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -14,21 +20,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-//    private final AuthService authService; 서비스 추가 예정
-//    private final JwtProvider jwtProvider; 추가 예정
+    private final AuthService authService;
 
     @PostMapping("/apple")
-    public ResponseEntity<Void> appleLogin() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    public ResponseEntity<SocialLoginResponse> appleLogin(
+            @RequestBody AppleLoginRequest request
+    ) {
+        SocialLoginResponse response = authService.appleLogin(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/kakao")
-    public ResponseEntity<Void> kakaoLogin() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    public ResponseEntity<SocialLoginResponse> kakaoLogin(
+            @RequestBody KakaoLoginRequest request
+    ) {
+        SocialLoginResponse response = authService.kakaoLogin(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Void> createRefreshToken() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    public ResponseEntity<TokenRefreshResponse> refresh(
+            @RequestHeader("Refresh-Token") String refreshToken
+    ) {
+        TokenRefreshResponse response = authService.refresh(refreshToken);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        authService.logout(userId);
+        return ResponseEntity.noContent().build();
     }
 }

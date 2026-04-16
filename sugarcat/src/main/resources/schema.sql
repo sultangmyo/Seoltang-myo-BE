@@ -17,6 +17,7 @@ DROP TYPE IF EXISTS period_type_enum;
 DROP TYPE IF EXISTS meal_status_enum;
 DROP TYPE IF EXISTS sugar_status_enum;
 DROP TYPE IF EXISTS schedule_type_enum;
+DROP TYPE IF EXISTS provider_type_enum;
 
 
 -- =========================================
@@ -26,6 +27,8 @@ CREATE TYPE schedule_type_enum AS ENUM ('MEAL','BLOOD_SUGAR','INSULIN');
 CREATE TYPE sugar_status_enum AS ENUM ('LOW','NORMAL','HIGH');
 CREATE TYPE meal_status_enum AS ENUM ('FULL','PARTIAL');
 CREATE TYPE period_type_enum AS ENUM ('WEEK','MONTH');
+CREATE TYPE provider_type_enum AS ENUM ('KAKAO','APPLE');
+
 
 -- =========================================
 -- 1. cats
@@ -55,10 +58,17 @@ CREATE TABLE users
     insulin_notification_enabled     BOOLEAN     NOT NULL DEFAULT FALSE,
     blood_sugar_notification_enabled BOOLEAN     NOT NULL DEFAULT FALSE,
     meal_notification_enabled        BOOLEAN     NOT NULL DEFAULT FALSE,
+    provider                         provider_type_enum NOT NULL,
+    provider_id                      VARCHAR(100) NOT NULL,
+    refresh_token                    VARCHAR(500),
+    refresh_token_expires_at         TIMESTAMPTZ,
 
     CONSTRAINT fk_users_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
-            ON DELETE CASCADE
+            ON DELETE CASCADE,
+
+    CONSTRAINT uq_users_provider_provider_id
+        UNIQUE (provider, provider_id)
 );
 
 -- =========================================
