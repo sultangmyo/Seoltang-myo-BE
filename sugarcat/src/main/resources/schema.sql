@@ -58,7 +58,7 @@ CREATE TABLE users
     insulin_notification_enabled     BOOLEAN     NOT NULL DEFAULT FALSE,
     blood_sugar_notification_enabled BOOLEAN     NOT NULL DEFAULT FALSE,
     meal_notification_enabled        BOOLEAN     NOT NULL DEFAULT FALSE,
-    provider                         provider_type_enum NULL,
+    provider                         provider_type_enum NOT NULL,
     provider_id                      VARCHAR(100) NOT NULL,
     refresh_token                    VARCHAR(500),
     refresh_token_expires_at         TIMESTAMPTZ,
