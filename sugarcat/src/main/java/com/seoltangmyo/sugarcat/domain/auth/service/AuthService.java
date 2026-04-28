@@ -25,6 +25,7 @@ public class AuthService {
 
     private final UserRepository userRepository; // 유저 조회/저장용 리포지토리
     private final JwtProvider jwtProvider; // JWT 생성/검증 도구
+    private final AppleTokenVerifier appleTokenVerifier;
 
     @Transactional
     public SocialLoginResponse appleLogin(AppleLoginRequest request) {
@@ -112,9 +113,7 @@ public class AuthService {
     }
 
     private String extractAppleProviderId(String identityToken) {
-        // Apple identity token 검증 후 sub 반환
-        // 지금은 임시 예시
-        throw new UnsupportedOperationException("Apple 로그인 검증 로직을 아직 구현하지 않았습니다.");
+        return appleTokenVerifier.verifyAndExtractSubject(identityToken);
     }
 
     private String extractKakaoProviderId(String kakaoAccessToken) {
