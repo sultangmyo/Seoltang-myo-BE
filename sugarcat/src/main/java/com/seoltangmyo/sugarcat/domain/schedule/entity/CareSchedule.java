@@ -4,13 +4,23 @@ import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "care_schedules")
+@Table(
+        name = "care_schedules",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uq_care_schedules_cat_type_sequence",
+                        columnNames = {"cat_id", "schedule_type", "sequence"}
+                )
+        }
+)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CareSchedule {
@@ -32,6 +42,6 @@ public class CareSchedule {
     private int sequence;
 
     @Column(name = "scheduled_time", nullable = false)
-    private LocalTime scheduleTime;
+    private LocalTime scheduledTime;
 
 }
