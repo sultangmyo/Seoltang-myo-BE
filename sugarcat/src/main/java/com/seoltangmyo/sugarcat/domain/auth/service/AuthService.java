@@ -120,10 +120,12 @@ public class AuthService {
     private String extractKakaoProviderId(String kakaoAccessToken) {
         KakaoUserInfoResponse response = kakaoApiClient.getUserInfo(kakaoAccessToken); // 카카오 서버에 사용자 정보 요청
 
-        if (response == null || response.id() == null) { // 응답이 비정상인지 확인
+        Long id = response.id();
+
+        if (id == null) {
             throw new IllegalArgumentException("카카오 사용자 정보를 가져오지 못했습니다.");
         }
 
-        return String.valueOf(response.id()); // Long id를 String providerId로 변환
+        return id.toString();
     }
 }
