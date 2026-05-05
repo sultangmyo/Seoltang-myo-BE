@@ -4,17 +4,20 @@ import com.seoltangmyo.sugarcat.domain.auth.client.AppleApiClient;
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKey;
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKeyResponse;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -23,18 +26,22 @@ public class AppleTokenVerifier {
     private static final String APPLE_ISSUER = "https://appleid.apple.com";
 
     private final AppleApiClient appleApiClient;
+    private final ObjectMapper objectMapper;
 
     @Value("${oauth2.apple.client-id}")
     private String appleClientId;
 
     public String verifyAndExtractSubject(String identityToken) {
-        JwsHeader header = getHeader(identityToken);
+        Map<String, String> header = parseHeader(identityToken);
 
-        ApplePublicKey applePublicKey = findMatchingKey(
-                header.getKeyId(),
-                header.getAlgorithm()
-        );
+        String kid = header.get("kid");
+        String alg = header.get("alg");
 
+        if (kid == null || alg == null) {
+            throw new IllegalArgumentException("Apple identityToken 헤더가 올바르지 않습니다.");
+        }
+
+        ApplePublicKey applePublicKey = findMatchingKey(kid, alg);
         PublicKey publicKey = createPublicKey(applePublicKey);
 
         Claims claims = Jwts.parser()
@@ -48,11 +55,32 @@ public class AppleTokenVerifier {
         return claims.getSubject();
     }
 
-    private JwsHeader getHeader(String identityToken) {
-        return Jwts.parser()
-                .build()
-                .parseSignedClaims(identityToken)
-                .getHeader();
+    private Map<String, String> parseHeader(String identityToken) {
+        try {
+            String[] tokenParts = identityToken.split("\\."); // JWT를 header, payload, signature로 분리
+
+            if (tokenParts.length != 3) {
+                throw new IllegalArgumentException("identityToken 형식이 올바르지 않습니다.");
+            }
+
+            String headerBase64 = tokenParts[0];
+
+            byte[] decodedHeader = Base64.getUrlDecoder().decode(headerBase64);
+
+            String headerJson = new String(decodedHeader, StandardCharsets.UTF_8);
+
+            return objectMapper.readValue(
+                    headerJson,
+                    new TypeReference<>() {
+                    }
+            );
+
+        } catch (IllegalArgumentException e) {
+            throw e;
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("identityToken 헤더 파싱에 실패했습니다.", e);
+        }
     }
 
     private ApplePublicKey findMatchingKey(String kid, String alg) {
