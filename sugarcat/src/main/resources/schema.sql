@@ -62,6 +62,7 @@ CREATE TABLE users
     blood_sugar_notification_enabled    BOOLEAN     NOT NULL DEFAULT FALSE,
     meal_notification_enabled           BOOLEAN     NOT NULL DEFAULT FALSE,
     weekly_report_notification_enabled  BOOLEAN     NOT NULL DEFAULT FALSE,
+    onboarding_completed                BOOLEAN     NOT NULL DEFAULT FALSE,
     provider                            provider_type_enum NOT NULL,
     provider_id                         VARCHAR(100) NOT NULL,
     refresh_token                       VARCHAR(500),
