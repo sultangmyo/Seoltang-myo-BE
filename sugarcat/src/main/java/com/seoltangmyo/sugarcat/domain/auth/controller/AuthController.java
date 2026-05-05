@@ -2,6 +2,7 @@ package com.seoltangmyo.sugarcat.domain.auth.controller;
 
 import com.seoltangmyo.sugarcat.domain.auth.dto.AppleLoginRequest;
 import com.seoltangmyo.sugarcat.domain.auth.dto.KakaoLoginRequest;
+import com.seoltangmyo.sugarcat.domain.auth.dto.OnboardingStatusResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
 import com.seoltangmyo.sugarcat.domain.auth.service.AuthService;
@@ -52,6 +53,24 @@ public class AuthController {
     ) {
         UUID userId = userDetails.getUserId();
         authService.logout(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/onboarding")
+    public ResponseEntity<OnboardingStatusResponse> getOnboardingStatus(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        OnboardingStatusResponse response = authService.getOnboardingStatus(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/onboarding")
+    public ResponseEntity<Void> completeOnboarding(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        authService.completeOnboarding(userId);
         return ResponseEntity.noContent().build();
     }
 }

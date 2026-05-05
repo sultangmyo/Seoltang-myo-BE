@@ -49,6 +49,9 @@ public class User {
     @Column(name = "weekly_report_notification_enabled", nullable = false)
     private boolean weeklyReportNotificationEnabled;
 
+    @Column(name = "onboarding_completed", nullable = false)
+    private boolean onboardingCompleted;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false, length = 20)
     private ProviderType provider;
@@ -73,6 +76,10 @@ public class User {
     public void clearRefreshToken() {
         this.refreshToken = null;
         this.refreshTokenExpiresAt = null;
+    }
+
+    public void completeOnboarding() {
+        this.onboardingCompleted = true;
     }
 
 }
