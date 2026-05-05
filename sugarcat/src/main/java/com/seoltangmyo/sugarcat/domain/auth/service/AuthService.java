@@ -87,6 +87,21 @@ public class AuthService {
         user.clearRefreshToken(); // DB에 저장된 refresh token 제거
     }
 
+    public OnboardingStatusResponse getOnboardingStatus(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return new OnboardingStatusResponse(user.isOnboardingCompleted());
+    }
+
+    @Transactional
+    public void completeOnboarding(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.completeOnboarding();
+    }
+  
     private SocialLoginResponse loginOrSignUp(ProviderType provider, String providerId) {
         User user = userRepository.findByProviderAndProviderId(provider, providerId)
                 .orElseGet(()->userRepository.save(User.createSocialUser(provider, providerId)));
