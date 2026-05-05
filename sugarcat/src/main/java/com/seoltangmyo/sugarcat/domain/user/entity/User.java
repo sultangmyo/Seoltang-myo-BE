@@ -75,4 +75,20 @@ public class User {
         this.refreshTokenExpiresAt = null;
     }
 
+    public static User createSocialUser(ProviderType provider, String providerId) {
+        User user = new User();
+
+        user.provider = provider;
+        user.providerId = providerId;
+
+        user.insulinNotiEnabled = false;
+        user.bloodSugarNotiEnabled = false;
+        user.mealNotiEnabled = false;
+        user.weeklyReportNotificationEnabled = false;
+
+        // onboardingCompleted 추가해야함
+
+        return user;
+    }
+
 }
