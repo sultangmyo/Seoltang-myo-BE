@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS insulin_records;
 DROP TABLE IF EXISTS meal_records;
 DROP TABLE IF EXISTS blood_sugar_records;
 DROP TABLE IF EXISTS care_schedules;
-DROP TABLE IF EXISTS cat_care_settings;
+DROP TABLE IF EXISTS cat_care_settings; -- 추후에 삭제
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS cats;
 
@@ -37,11 +37,14 @@ CREATE TYPE provider_type_enum AS ENUM ('KAKAO','APPLE');
 -- =========================================
 CREATE TABLE cats
 (
-    id             UUID PRIMARY KEY,
-    name           VARCHAR(50) NOT NULL,
-    birth_date     DATE, -- 예시) YYYY-MM-DD
-    diagnosed_date DATE        NOT NULL,
-    invite_code    VARCHAR(50) UNIQUE
+    id                  UUID PRIMARY KEY,
+    name                VARCHAR(50) NOT NULL,
+    birth_date          DATE, -- 예시) YYYY-MM-DD
+    diagnosed_date      DATE        NOT NULL DEFAULT CURRENT_DATE,
+    invite_code         VARCHAR(50) UNIQUE,
+    meal_count          INT         NOT NULL CHECK (meal_count BETWEEN 1 AND 4),
+    blood_sugar_count   INT         NOT NULL CHECK (blood_sugar_count BETWEEN 1 AND 8),
+    insulin_count       INT         NOT NULL CHECK (insulin_count BETWEEN 1 AND 3)
 );
 
 -- =========================================
@@ -52,16 +55,17 @@ CREATE TABLE cats
 -- =========================================
 CREATE TABLE users
 (
-    id                               UUID PRIMARY KEY,
-    nickname                         VARCHAR(50) NOT NULL,
-    cat_id                           UUID        NOT NULL,
-    insulin_notification_enabled     BOOLEAN     NOT NULL DEFAULT FALSE,
-    blood_sugar_notification_enabled BOOLEAN     NOT NULL DEFAULT FALSE,
-    meal_notification_enabled        BOOLEAN     NOT NULL DEFAULT FALSE,
-    provider                         provider_type_enum NOT NULL,
-    provider_id                      VARCHAR(100) NOT NULL,
-    refresh_token                    VARCHAR(500),
-    refresh_token_expires_at         TIMESTAMPTZ,
+    id                                  UUID PRIMARY KEY,
+    nickname                            VARCHAR(50),
+    cat_id                              UUID,
+    insulin_notification_enabled        BOOLEAN     NOT NULL DEFAULT FALSE,
+    blood_sugar_notification_enabled    BOOLEAN     NOT NULL DEFAULT FALSE,
+    meal_notification_enabled           BOOLEAN     NOT NULL DEFAULT FALSE,
+    weekly_report_notification_enabled  BOOLEAN     NOT NULL DEFAULT FALSE,
+    provider                            provider_type_enum NOT NULL,
+    provider_id                         VARCHAR(100) NOT NULL,
+    refresh_token                       VARCHAR(500),
+    refresh_token_expires_at            TIMESTAMPTZ,
 
     CONSTRAINT fk_users_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -69,24 +73,6 @@ CREATE TABLE users
 
     CONSTRAINT uq_users_provider_provider_id
         UNIQUE (provider, provider_id)
-);
-
--- =========================================
--- 3. cat_care_settings
--- 하루 기본 관리 횟수
--- 고양이 1마리당 설정 1개만 존재 -> cat_id UNIQUE 제약
--- =========================================
-CREATE TABLE cat_care_settings
-(
-    id                UUID PRIMARY KEY,
-    cat_id            UUID NOT NULL UNIQUE,
-    meal_count        INT  NOT NULL CHECK (meal_count BETWEEN 1 AND 4),
-    blood_sugar_count INT  NOT NULL CHECK (blood_sugar_count BETWEEN 1 AND 8),
-    insulin_count     INT  NOT NULL CHECK (insulin_count BETWEEN 1 AND 3),
-
-    CONSTRAINT fk_cat_care_settings_cat
-        FOREIGN KEY (cat_id) REFERENCES cats (id)
-            ON DELETE CASCADE
 );
 
 -- =========================================
