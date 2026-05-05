@@ -87,29 +87,17 @@ public class AuthService {
         user.clearRefreshToken(); // DB에 저장된 refresh token 제거
     }
 
-    @Transactional
-    protected SocialLoginResponse loginOrSignUp(ProviderType provider, String providerId) {
+    private SocialLoginResponse loginOrSignUp(ProviderType provider, String providerId) {
         User user = userRepository.findByProviderAndProviderId(provider, providerId)
-                .orElse(null); // provider + providerId 조합으로 기존 유저 조회
+                .orElseGet(()->userRepository.save(User.createSocialUser(provider, providerId)));
 
-        boolean isNewUser = (user == null); // 신규 유저 여부 판단
+        String accessToken = jwtProvider.createAccessToken(user.getUserId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+        Instant refreshTokenExpiresAt = jwtProvider.getExpiration(refreshToken);
 
-        if (isNewUser) {
-            // 아직 너희 플로우상 신규 유저는 "고양이 생성 후 유저 생성"이므로
-            // 여기서는 회원 생성까지 하지 않고, 신규 여부만 내려주는 방식도 가능함.
-            // 하지만 지금 명세상 accessToken/refreshToken을 내려주고 있어서,
-            // 실제로는 유저가 이미 생성된 뒤 이 API가 호출되도록 맞추거나,
-            // 아래 로직을 너희 생성 플로우에 맞게 바꿔야 함.
-            throw new IllegalStateException("신규 유저입니다. 먼저 고양이/유저 생성 플로우를 완료해야 합니다.");
-        }
+        user.updateRefreshToken(refreshToken, refreshTokenExpiresAt);
 
-        String accessToken = jwtProvider.createAccessToken(user.getUserId()); // Access Token 발급
-        String refreshToken = jwtProvider.createRefreshToken(user.getUserId()); // Refresh Token 발급
-        Instant refreshTokenExpiresAt = jwtProvider.getExpiration(refreshToken); // Refresh Token 만료 시각 계산
-
-        user.updateRefreshToken(refreshToken, refreshTokenExpiresAt); // DB에 Refresh Token 저장
-
-        return new SocialLoginResponse(accessToken, refreshToken, false); // 기존 유저 로그인 응답
+        return new SocialLoginResponse(accessToken, refreshToken, false);
     }
 
     private String extractAppleProviderId(String identityToken) {
