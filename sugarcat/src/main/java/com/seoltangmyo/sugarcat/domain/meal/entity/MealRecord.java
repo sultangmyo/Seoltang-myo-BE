@@ -45,7 +45,4 @@ public class MealRecord {
     @Column(name = "meal_status", length = 20, nullable = false)
     private MealStatus mealStatus;
 
-
-
-
 }

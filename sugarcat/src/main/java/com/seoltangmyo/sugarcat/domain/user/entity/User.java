@@ -11,7 +11,15 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uq_users_provider_provider_id",
+                        columnNames = {"provider", "provider_id"}
+                )
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,10 +31,10 @@ public class User {
     private UUID userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cat_id", nullable = false)
+    @JoinColumn(name = "cat_id")
     private Cat cat;
 
-    @Column(name = "nickname", nullable = false, length = 50)
+    @Column(name = "nickname", length = 50)
     private String nickname;
 
     @Column(name = "insulin_notification_enabled", nullable = false)
@@ -38,15 +46,15 @@ public class User {
     @Column(name = "meal_notification_enabled", nullable = false)
     private boolean mealNotiEnabled;
 
-
-    // JWT + 소셜 로그인
+    @Column(name = "weekly_report_notification_enabled", nullable = false)
+    private boolean weeklyReportNotificationEnabled;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false, length = 20)
-    private ProviderType provider; // APPLE, KAKAO
+    private ProviderType provider;
 
     @Column(name = "provider_id", nullable = false, length = 100)
-    private String providerId; // 애플 sub, 카카오 user id
+    private String providerId;
 
     @Column(name = "refresh_token", length = 500)
     private String refreshToken;
@@ -66,4 +74,5 @@ public class User {
         this.refreshToken = null;
         this.refreshTokenExpiresAt = null;
     }
+
 }

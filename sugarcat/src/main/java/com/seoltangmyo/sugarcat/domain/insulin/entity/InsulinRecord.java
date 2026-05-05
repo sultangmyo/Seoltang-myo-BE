@@ -5,6 +5,7 @@ import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "insulin_records")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class InsulinRecord {
@@ -37,6 +39,5 @@ public class InsulinRecord {
 
     @Column(name = "is_injected", nullable = false)
     private boolean isInjected = false;
-
 
 }

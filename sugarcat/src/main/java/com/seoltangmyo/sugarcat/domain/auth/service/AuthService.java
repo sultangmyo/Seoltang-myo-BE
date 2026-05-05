@@ -1,10 +1,8 @@
 package com.seoltangmyo.sugarcat.domain.auth.service;
 
 
-import com.seoltangmyo.sugarcat.domain.auth.dto.AppleLoginRequest;
-import com.seoltangmyo.sugarcat.domain.auth.dto.KakaoLoginRequest;
-import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
-import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
+import com.seoltangmyo.sugarcat.domain.auth.client.KakaoApiClient;
+import com.seoltangmyo.sugarcat.domain.auth.dto.*;
 import com.seoltangmyo.sugarcat.domain.user.entity.ProviderType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
@@ -26,6 +24,8 @@ public class AuthService {
     private final UserRepository userRepository; // 유저 조회/저장용 리포지토리
     private final JwtProvider jwtProvider; // JWT 생성/검증 도구
     private final AppleTokenVerifier appleTokenVerifier;
+
+    private final KakaoApiClient kakaoApiClient;
 
     @Transactional
     public SocialLoginResponse appleLogin(AppleLoginRequest request) {
@@ -117,8 +117,14 @@ public class AuthService {
     }
 
     private String extractKakaoProviderId(String kakaoAccessToken) {
-        // 카카오 사용자 정보 API 호출 후 id 반환
-        // 지금은 임시 예시
-        throw new UnsupportedOperationException("Kakao 로그인 검증 로직을 아직 구현하지 않았습니다.");
+        KakaoUserInfoResponse response = kakaoApiClient.getUserInfo(kakaoAccessToken); // 카카오 서버에 사용자 정보 요청
+
+        Long id = response.id();
+
+        if (id == null) {
+            throw new IllegalArgumentException("카카오 사용자 정보를 가져오지 못했습니다.");
+        }
+
+        return id.toString();
     }
 }

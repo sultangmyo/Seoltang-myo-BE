@@ -4,6 +4,7 @@ import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "blood_sugar_statistics")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class BloodSugarStatistic {
@@ -18,7 +20,7 @@ public class BloodSugarStatistic {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID BloodSugarStatisticId;
+    private UUID bloodSugarStatisticId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id", nullable = false)
@@ -38,7 +40,6 @@ public class BloodSugarStatistic {
     private Integer maxSugar;
 
     @Column(name = "record_count", nullable = false)
-    private Integer recordCount;
-
+    private int recordCount;
 
 }
