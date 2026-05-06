@@ -20,15 +20,6 @@ DROP TYPE IF EXISTS schedule_type_enum;
 DROP TYPE IF EXISTS provider_type_enum;
 
 
--- =========================================
--- ENUM 타입 정의
--- =========================================
-CREATE TYPE schedule_type_enum AS ENUM ('MEAL','BLOOD_SUGAR','INSULIN');
-CREATE TYPE sugar_status_enum AS ENUM ('LOW','NORMAL','HIGH');
-CREATE TYPE meal_status_enum AS ENUM ('FULL','PARTIAL');
-CREATE TYPE period_type_enum AS ENUM ('WEEK','MONTH');
-CREATE TYPE provider_type_enum AS ENUM ('KAKAO','APPLE');
-
 
 -- =========================================
 -- 1. cats
@@ -63,7 +54,7 @@ CREATE TABLE users
     meal_notification_enabled           BOOLEAN     NOT NULL DEFAULT FALSE,
     weekly_report_notification_enabled  BOOLEAN     NOT NULL DEFAULT FALSE,
     onboarding_completed                BOOLEAN     NOT NULL DEFAULT FALSE,
-    provider                            provider_type_enum NOT NULL,
+    provider VARCHAR(20) NOT NULL,
     provider_id                         VARCHAR(100) NOT NULL,
     refresh_token                       VARCHAR(500),
     refresh_token_expires_at            TIMESTAMPTZ,
@@ -85,7 +76,7 @@ CREATE TABLE care_schedules
 (
     id             UUID PRIMARY KEY,
     cat_id         UUID               NOT NULL,
-    schedule_type  schedule_type_enum NOT NULL,
+    schedule_type VARCHAR(20) NOT NULL,
     sequence       INT                NOT NULL CHECK (sequence >= 1),
     scheduled_time TIME               NOT NULL,  -- 예시) HH:mm:ss
 
@@ -110,7 +101,7 @@ CREATE TABLE blood_sugar_records
     record_time         TIME              NOT NULL,
     sequence            INT               NOT NULL CHECK (sequence >= 1),
     sugar_value         INT               NOT NULL CHECK (sugar_value >= 0),
-    sugar_status        sugar_status_enum NOT NULL,
+    sugar_status VARCHAR(20) NOT NULL,
 
     CONSTRAINT fk_blood_sugar_records_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -136,7 +127,7 @@ CREATE TABLE meal_records
     record_date         DATE             NOT NULL,
     record_time         TIME             NOT NULL,
     sequence            INT              NOT NULL CHECK (sequence >= 1),
-    meal_status         meal_status_enum NOT NULL,
+    meal_status VARCHAR(20) NOT NULL,
 
     CONSTRAINT fk_meal_records_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -184,7 +175,7 @@ CREATE TABLE blood_sugar_statistics
 (
     id           UUID PRIMARY KEY,
     cat_id       UUID             NOT NULL,
-    period_type  period_type_enum NOT NULL,
+    period_type VARCHAR(20) NOT NULL,
     target_date  DATE             NOT NULL,
     avg_sugar    INT,
     max_sugar    INT,

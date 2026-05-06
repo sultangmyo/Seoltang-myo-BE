@@ -89,7 +89,7 @@ public class User {
         user.mealNotiEnabled = false;
         user.weeklyReportNotificationEnabled = false;
 
-        // onboardingCompleted 추가해야함
+        user.onboardingCompleted = false;
 
         return user;
     }
