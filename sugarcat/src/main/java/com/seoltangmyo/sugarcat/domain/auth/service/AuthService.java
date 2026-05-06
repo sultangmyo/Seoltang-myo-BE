@@ -112,7 +112,7 @@ public class AuthService {
 
         user.updateRefreshToken(refreshToken, refreshTokenExpiresAt);
 
-        return new SocialLoginResponse(accessToken, refreshToken, false);
+        return new SocialLoginResponse(accessToken, refreshToken);
     }
 
     private String extractAppleProviderId(String identityToken) {
