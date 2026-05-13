@@ -69,16 +69,4 @@ public class BloodSugarRecordController {
 //        return ResponseEntity.noContent().build();
 //    }
 
-    // 혈당 주간 리포트
-//    @GetMapping("/me/week-report")
-//    public ResponseEntity<WeeklyBloodSugarReportResponse> getWeeklyBloodSugarReport(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-//            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-//            ) {
-//        UUID userId = userDetails.getUserId();
-//        WeeklyBloodSugarReportResponse response = bloodSugarRecordService.getWeeklyBloodSugarReport(userId, startDate);
-//
-//        return ResponseEntity.ok(response);
-//    }
-
 }
