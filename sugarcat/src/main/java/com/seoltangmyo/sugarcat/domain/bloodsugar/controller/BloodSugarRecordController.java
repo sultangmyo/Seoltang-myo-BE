@@ -2,6 +2,7 @@ package com.seoltangmyo.sugarcat.domain.bloodsugar.controller;
 
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateResponse;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordListResponse;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -34,16 +35,16 @@ public class BloodSugarRecordController {
     }
 
     // 날짜별 혈당 기록 조회
-//    @GetMapping("/me")
-//    public ResponseEntity<List<BloodSugarRecordResponse>> getBloodSugarRecordsByDate(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-//            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-//    ) {
-//        UUID userId = userDetails.getUserId();
-//        List<BloodSugarRecordResponse> responseList = bloodSugarRecordService.getBloodSugarRecordsByDate(userId, date);
-//
-//        return ResponseEntity.ok(responseList);
-//    }
+    @GetMapping("/me")
+    public ResponseEntity<BloodSugarRecordListResponse> getBloodSugarRecordsByDate(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        UUID userId = userDetails.getUserId();
+        BloodSugarRecordListResponse response = bloodSugarRecordService.getBloodSugarRecordsByDate(userId, date);
+
+        return ResponseEntity.ok(response);
+    }
 
     // 혈당 기록 수정
 //    @PatchMapping("/me")

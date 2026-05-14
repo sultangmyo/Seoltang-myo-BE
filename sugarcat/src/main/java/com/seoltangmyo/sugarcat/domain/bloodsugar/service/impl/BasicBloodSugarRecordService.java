@@ -2,6 +2,8 @@ package com.seoltangmyo.sugarcat.domain.bloodsugar.service.impl;
 
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateResponse;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordListResponse;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordResponse;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.BloodSugarRecord;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.SugarStatus;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.repository.BloodSugarRecordRepository;
@@ -12,6 +14,8 @@ import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,6 +52,32 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 bloodSugarRecord.getBloodSugarRecordId(),
                 bloodSugarRecord.getSugarStatus()
         );
+    }
+
+    @Override
+    public BloodSugarRecordListResponse getBloodSugarRecordsByDate(
+            UUID userId,
+            LocalDate date
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+
+        List<BloodSugarRecord> records =
+                bloodSugarRecordRepository.findAllByCatAndRecordDateOrderBySequenceAsc(cat, date);
+
+        List<BloodSugarRecordResponse> recordResponses = records.stream()
+                .map(record -> new BloodSugarRecordResponse(
+                        user.getNickname(),
+                        record.getRecordTime(),
+                        record.getSequence(),
+                        record.getSugarValue(),
+                        record.getSugarStatus()
+                ))
+                .toList();
+
+        return new BloodSugarRecordListResponse(recordResponses);
     }
 
 }
