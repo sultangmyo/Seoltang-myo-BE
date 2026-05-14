@@ -10,6 +10,7 @@ import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,6 +23,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public BloodSugarRecordCreateResponse createBloodSugarRecord(
             UUID userId,
             BloodSugarRecordCreateRequest request
@@ -52,6 +54,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BloodSugarRecordListResponse getBloodSugarRecordsByDate(
             UUID userId,
             LocalDate date
@@ -78,6 +81,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
     }
 
     @Override
+    @Transactional
     public void updateBloodSugarRecord(
             UUID userId,
             BloodSugarRecordUpdateRequest request
@@ -105,6 +109,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
     }
 
     @Override
+    @Transactional
     public void deleteBloodSugarRecord(
             UUID userId,
             LocalDate date,
