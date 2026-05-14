@@ -46,4 +46,15 @@ public class BloodSugarRecord {
     @Column(name = "sugar_status", length = 20, nullable = false)
     private SugarStatus sugarStatus;
 
+
+    public void update(
+            LocalTime recordTime,
+            int sugarValue,
+            SugarStatus sugarStatus
+    ) {
+        this.recordTime = recordTime;
+        this.sugarValue = sugarValue;
+        this.sugarStatus = sugarStatus;
+    }
+
 }

@@ -1,9 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.bloodsugar.service.impl;
 
-import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateRequest;
-import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateResponse;
-import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordListResponse;
-import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordResponse;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.*;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.BloodSugarRecord;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.SugarStatus;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.repository.BloodSugarRecordRepository;
@@ -78,6 +75,33 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 .toList();
 
         return new BloodSugarRecordListResponse(recordResponses);
+    }
+
+    @Override
+    public void updateBloodSugarRecord(
+            UUID userId,
+            BloodSugarRecordUpdateRequest request
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+
+        BloodSugarRecord bloodSugarRecord =
+                bloodSugarRecordRepository.findByCatAndRecordDateAndSequence(
+                        cat,
+                        request.recordedDate(),
+                        request.sequence()
+                ).orElseThrow(()-> new IllegalArgumentException("혈당 기록을 찾을 수 없습니다."));
+
+        SugarStatus sugarStatus = SugarStatus.from(request.sugarValue());
+
+        // 더티체킹
+        bloodSugarRecord.update(
+                request.recordedTime(),
+                request.sugarValue(),
+                sugarStatus
+        );
     }
 
 }

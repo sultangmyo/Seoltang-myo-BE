@@ -3,6 +3,7 @@ package com.seoltangmyo.sugarcat.domain.bloodsugar.controller;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordCreateResponse;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordListResponse;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -41,22 +42,24 @@ public class BloodSugarRecordController {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         UUID userId = userDetails.getUserId();
+
         BloodSugarRecordListResponse response = bloodSugarRecordService.getBloodSugarRecordsByDate(userId, date);
 
         return ResponseEntity.ok(response);
     }
 
     // 혈당 기록 수정
-//    @PatchMapping("/me")
-//    public ResponseEntity<BloodSugarRecordResponse> updateBloodSugarRecord(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-//            @RequestBody BloodSugarRecordUpdateRequest request
-//    ) {
-//        UUID userId = userDetails.getUserId();
-//        BloodSugarRecordResponse response = bloodSugarRecordService.updateBloodSugarRecord(userId, request);
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @PatchMapping("/me")
+    public ResponseEntity<Void> updateBloodSugarRecord(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody BloodSugarRecordUpdateRequest request
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        bloodSugarRecordService.updateBloodSugarRecord(userId, request);
+
+        return ResponseEntity.noContent().build();
+    }
 
     // 혈당 기록 삭제
 //    @DeleteMapping("/me")
