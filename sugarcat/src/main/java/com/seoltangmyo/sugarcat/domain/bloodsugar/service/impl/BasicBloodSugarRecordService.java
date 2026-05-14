@@ -104,4 +104,25 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
         );
     }
 
+    @Override
+    public void deleteBloodSugarRecord(
+            UUID userId,
+            LocalDate date,
+            int sequence
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+
+        BloodSugarRecord bloodSugarRecord =
+                bloodSugarRecordRepository.findByCatAndRecordDateAndSequence(
+                        cat,
+                        date,
+                        sequence
+                ).orElseThrow(()-> new IllegalArgumentException("혈당 기록을 찾을 수 없습니다."));
+
+        bloodSugarRecordRepository.delete(bloodSugarRecord);
+    }
+
 }

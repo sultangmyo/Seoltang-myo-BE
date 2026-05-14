@@ -14,4 +14,6 @@ public interface BloodSugarRecordService {
     BloodSugarRecordListResponse getBloodSugarRecordsByDate(UUID userId, LocalDate date);
 
     void updateBloodSugarRecord(UUID userId, BloodSugarRecordUpdateRequest request);
+
+    void deleteBloodSugarRecord(UUID userId, LocalDate date, int sequence);
 }

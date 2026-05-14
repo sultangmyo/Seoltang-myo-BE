@@ -62,15 +62,17 @@ public class BloodSugarRecordController {
     }
 
     // 혈당 기록 삭제
-//    @DeleteMapping("/me")
-//    public ResponseEntity<Void> deleteBloodSugarRecord(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-//            @RequestParam("recordId") Long recordId
-//    ) {
-//        UUID userId = userDetails.getUserId();
-//        bloodSugarRecordService.deleteBloodSugarRecord(userId, recordId);
-//
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteBloodSugarRecord(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("sequence") int sequence
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        bloodSugarRecordService.deleteBloodSugarRecord(userId, date, sequence);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }
