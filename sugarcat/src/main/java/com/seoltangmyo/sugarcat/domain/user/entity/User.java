@@ -60,6 +60,12 @@ public class User extends BaseEntity {
     @Column(name = "refresh_token_expires_at")
     private Instant refreshTokenExpiresAt;
 
+    @Column(name = "apns_device_token", length = 500)
+    private String apnsDeviceToken;
+
+    @Column(name = "apns_token_active", nullable = false)
+    private boolean apnsTokenActive;
+
 
     // 비즈니스 메서드
 
@@ -85,12 +91,22 @@ public class User extends BaseEntity {
         user.weeklyReportNotificationEnabled = false;
 
         user.onboardingCompleted = false;
+        user.apnsTokenActive = false;
 
         return user;
     }
   
     public void completeOnboarding() {
         this.onboardingCompleted = true;
+    }
+
+    public void updateApnsDeviceToken(String apnsDeviceToken) {
+        this.apnsDeviceToken = apnsDeviceToken;
+        this.apnsTokenActive = true;
+    }
+
+    public void deactivateApnsToken() {
+        this.apnsTokenActive = false;
     }
 
 }

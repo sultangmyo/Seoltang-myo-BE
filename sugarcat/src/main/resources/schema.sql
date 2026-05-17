@@ -59,6 +59,8 @@ CREATE TABLE users
     provider_id                         VARCHAR(100) NOT NULL,
     refresh_token                       VARCHAR(500),
     refresh_token_expires_at            TIMESTAMPTZ,
+    apns_device_token                   VARCHAR(500),
+    apns_token_active                   BOOLEAN     NOT NULL DEFAULT FALSE,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
