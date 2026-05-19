@@ -30,9 +30,7 @@ public class BloodSugarRecordController {
             @RequestBody BloodSugarRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
-
         BloodSugarRecordCreateResponse response = bloodSugarRecordService.createBloodSugarRecord(userId, request);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -43,9 +41,7 @@ public class BloodSugarRecordController {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         UUID userId = userDetails.getUserId();
-
         BloodSugarRecordListResponse response = bloodSugarRecordService.getBloodSugarRecordsByDate(userId, date);
-
         return ResponseEntity.ok(response);
     }
 
@@ -56,9 +52,7 @@ public class BloodSugarRecordController {
             @RequestBody BloodSugarRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
-
         bloodSugarRecordService.updateBloodSugarRecord(userId, request);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -70,9 +64,7 @@ public class BloodSugarRecordController {
             @RequestParam("sequence") int sequence
     ) {
         UUID userId = userDetails.getUserId();
-
         bloodSugarRecordService.deleteBloodSugarRecord(userId, date, sequence);
-
         return ResponseEntity.noContent().build();
     }
 
