@@ -109,4 +109,20 @@ public class User extends BaseEntity {
         this.apnsTokenActive = false;
     }
 
+    // 알림 허용 판단
+    public boolean canReceiveInsulinNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && insulinNotiEnabled;
+    }
+
+    public boolean canReceiveBloodSugarNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && bloodSugarNotiEnabled;
+    }
+
+    public boolean canReceiveMealNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && mealNotiEnabled;
+    }
+
+    public boolean canReceiveWeeklyReportNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && weeklyReportNotificationEnabled;
+    }
 }
