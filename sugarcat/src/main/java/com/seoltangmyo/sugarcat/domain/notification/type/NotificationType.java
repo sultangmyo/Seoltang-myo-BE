@@ -11,5 +11,5 @@ public enum NotificationType {
     // 이벤트 알림
     INSULIN_COMPLETED,
     BLOOD_SUGAR_COMPLETED,
-    MEAL_COMPLETED,
+    MEAL_COMPLETED
 }
