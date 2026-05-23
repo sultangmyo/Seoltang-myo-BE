@@ -29,4 +29,8 @@ public interface NotificationService {
             LocalDate targetDate,
             int sequence
     );
+
+    void sendDueReminderNotifications();
+
+    void sendWeeklyReportNotifications();
 }
