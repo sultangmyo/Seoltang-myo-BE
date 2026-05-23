@@ -3,6 +3,7 @@ package com.seoltangmyo.sugarcat.domain.notification.service;
 import com.eatthepath.pushy.apns.ApnsClient;
 import com.eatthepath.pushy.apns.PushNotificationResponse;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
+import com.seoltangmyo.sugarcat.domain.notification.dto.ApnsSendResult;
 import com.seoltangmyo.sugarcat.global.config.apns.ApnsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ public class ApnsSender {
     private final ApnsProperties apnsProperties;
     private final ObjectMapper objectMapper;
 
-    public boolean send(String deviceToken, Map<String, Object> payload) {
+    public ApnsSendResult send(String deviceToken, Map<String, Object> payload) {
         try {
             String payloadJson = objectMapper.writeValueAsString(payload);
 
@@ -36,23 +37,37 @@ public class ApnsSender {
 
             if (response.isAccepted()) {
                 log.info("APNs 알림 전송 성공");
-                return true;
+                return ApnsSendResult.accepted();
             }
 
-            log.warn("APNs 알림 전송 거부 - reason={}, tokenInvalidationTimestamp={}",
-                    response.getRejectionReason(),
-                    response.getTokenInvalidationTimestamp().orElse(null));
+            String reason = response.getRejectionReason()
+                    .orElse("UNKNOWN");
+            boolean invalidToken = isInvalidTokenReason(reason);
 
-            return false;
+            log.warn(
+                    "APNs 전송 거부 - reason={}, invalidToken={}, invalidatedAt={}",
+                    reason,
+                    invalidToken,
+                    response.getTokenInvalidationTimestamp().orElse(null)
+            );
+
+            return ApnsSendResult.rejected(reason, invalidToken);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("APNs 알림 전송 중 인터럽트 발생", e);
-            return false;
+            return ApnsSendResult.failed("INTERRUPTED");
 
         } catch (Exception e) {
             log.error("APNs 알림 전송 실패", e);
-            return false;
+            return ApnsSendResult.failed("SEND_FAILED");
         }
+    }
+
+    // 토큰 자체가 잘못된 경우만 true
+    private boolean isInvalidTokenReason(String reason) {
+        return "BadDeviceToken".equals(reason)
+                || "Unregistered".equals(reason)
+                || "DeviceTokenNotForTopic".equals(reason);
     }
 }

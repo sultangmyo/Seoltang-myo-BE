@@ -6,6 +6,7 @@ import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.cat.repository.CatRepository;
 import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepository;
 import com.seoltangmyo.sugarcat.domain.meal.repository.MealRecordRepository;
+import com.seoltangmyo.sugarcat.domain.notification.dto.ApnsSendResult;
 import com.seoltangmyo.sugarcat.domain.notification.service.ApnsSender;
 import com.seoltangmyo.sugarcat.domain.notification.service.NotificationPayloadFactory;
 import com.seoltangmyo.sugarcat.domain.notification.service.NotificationService;
@@ -273,12 +274,23 @@ public class BasicNotificationService implements NotificationService {
                 continue;
             }
 
-            boolean success = apnsSender.send(receiver.getApnsDeviceToken(), payload);
+            ApnsSendResult result = apnsSender.send(receiver.getApnsDeviceToken(), payload);
 
-            if (!success) {
-                receiver.deactivateApnsToken();
-                log.warn("APNs 토큰 비활성화 - userId={}", receiver.getId());
+            if (result.success()) {
+                return;
             }
+
+            if (result.invalidToken()) {
+                receiver.deactivateApnsToken();
+                log.warn("APNs 토큰 비활성화 - userId={}, reason={}",
+                        receiver.getId(),
+                        result.reason());
+                return;
+            }
+
+            log.warn("APNs 전송 실패, 토큰은 유지 - userId={}, reason={}",
+                    receiver.getId(),
+                    result.reason());
         }
     }
 }
