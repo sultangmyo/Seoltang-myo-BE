@@ -35,7 +35,10 @@ public class AuthController {
     public ResponseEntity<SocialLoginResponse> kakaoLogin(
             @RequestBody KakaoLoginRequest request
     ) {
+        log.info("body = {}", request);
+        log.info("##log## 컨트롤러 - 카카오로그인 진입 ");
         SocialLoginResponse response = authService.kakaoLogin(request);
+        log.info("##log## 컨트롤러 - 카카오로그인 종료");
         return ResponseEntity.ok(response);
     }
 
@@ -60,8 +63,10 @@ public class AuthController {
     public ResponseEntity<OnboardingStatusResponse> getOnboardingStatus(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        log.info("##log## 컨트롤러 - 온보딩 진입 ");
         UUID userId = userDetails.getUserId();
         OnboardingStatusResponse response = authService.getOnboardingStatus(userId);
+        log.info("##log## 컨트롤러 - 온보딩 종료 ");
         return ResponseEntity.ok(response);
     }
 
