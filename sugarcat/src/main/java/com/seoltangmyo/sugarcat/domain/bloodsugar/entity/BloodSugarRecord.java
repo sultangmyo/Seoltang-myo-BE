@@ -3,10 +3,7 @@ package com.seoltangmyo.sugarcat.domain.bloodsugar.entity;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,6 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "blood_sugar_records")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class BloodSugarRecord {
@@ -47,5 +45,16 @@ public class BloodSugarRecord {
     @Enumerated(EnumType.STRING)
     @Column(name = "sugar_status", length = 20, nullable = false)
     private SugarStatus sugarStatus;
+
+
+    public void update(
+            LocalTime recordTime,
+            int sugarValue,
+            SugarStatus sugarStatus
+    ) {
+        this.recordTime = recordTime;
+        this.sugarValue = sugarValue;
+        this.sugarStatus = sugarStatus;
+    }
 
 }
