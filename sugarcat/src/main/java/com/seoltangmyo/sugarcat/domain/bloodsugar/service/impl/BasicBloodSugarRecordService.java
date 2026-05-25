@@ -69,7 +69,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
 
         List<BloodSugarRecordResponse> recordResponses = records.stream()
                 .map(record -> new BloodSugarRecordResponse(
-                        user.getNickname(),
+                        record.getRecordedBy() != null ? record.getRecordedBy().getNickname() : "탈퇴한 사용자",
                         record.getRecordTime(),
                         record.getSequence(),
                         record.getSugarValue(),
