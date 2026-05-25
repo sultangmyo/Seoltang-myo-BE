@@ -9,11 +9,13 @@ import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import com.seoltangmyo.sugarcat.global.security.jwt.JwtProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -39,11 +41,16 @@ public class AuthService {
 
     @Transactional
     public SocialLoginResponse kakaoLogin(KakaoLoginRequest request) {
+        log.info("##log## 서비스 - 카카오로그인 진입 ");
         String kakaoAccessToken = request.accessToken(); // 프론트가 보낸 카카오 access token
 
+        log.info("카카오 토큰 null 여부 = {}", kakaoAccessToken == null);
+        log.info("카카오 토큰 길이 = {}", kakaoAccessToken == null ? null : kakaoAccessToken.length());
+        log.info("카카오 토큰 앞부분 = {}", kakaoAccessToken == null ? null : kakaoAccessToken.substring(0, Math.min(10, kakaoAccessToken.length())));
         // 카카오 API 호출 후 user id 추출
         String providerId = extractKakaoProviderId(kakaoAccessToken); // 카카오의 고유 식별값(id)
 
+        log.info("##log## 서비스 - 카카오로그인 종료 ");
         return loginOrSignUp(KAKAO, providerId); // 기존 유저 조회 또는 신규 판단 후 토큰 발급
     }
 
@@ -89,9 +96,10 @@ public class AuthService {
     }
 
     public OnboardingStatusResponse getOnboardingStatus(UUID userId) {
+        log.info("##log## 서비스 - 온보딩 진입 ");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
+        log.info("##log## 서비스 - 온보딩 종료 유저 아이디: {}", userId);
         return new OnboardingStatusResponse(user.isOnboardingCompleted());
     }
 
