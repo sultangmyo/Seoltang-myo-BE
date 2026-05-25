@@ -8,14 +8,12 @@ import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
 import com.seoltangmyo.sugarcat.domain.auth.service.AuthService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -35,7 +33,10 @@ public class AuthController {
     public ResponseEntity<SocialLoginResponse> kakaoLogin(
             @RequestBody KakaoLoginRequest request
     ) {
+        log.info("body = {}", request);
+        log.info("##log## 컨트롤러 - 카카오로그인 진입 ");
         SocialLoginResponse response = authService.kakaoLogin(request);
+        log.info("##log## 컨트롤러 - 카카오로그인 종료");
         return ResponseEntity.ok(response);
     }
 
@@ -60,8 +61,10 @@ public class AuthController {
     public ResponseEntity<OnboardingStatusResponse> getOnboardingStatus(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        log.info("##log## 컨트롤러 - 온보딩 진입 ");
         UUID userId = userDetails.getUserId();
         OnboardingStatusResponse response = authService.getOnboardingStatus(userId);
+        log.info("##log## 컨트롤러 - 온보딩 종료 ");
         return ResponseEntity.ok(response);
     }
 
