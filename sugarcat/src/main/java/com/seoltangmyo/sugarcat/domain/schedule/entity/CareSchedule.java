@@ -5,6 +5,7 @@ import com.seoltangmyo.sugarcat.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ import java.time.LocalTime;
         }
 )
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CareSchedule extends BaseEntity {

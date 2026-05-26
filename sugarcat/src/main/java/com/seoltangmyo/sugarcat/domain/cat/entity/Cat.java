@@ -4,6 +4,7 @@ import com.seoltangmyo.sugarcat.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "cats")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cat extends BaseEntity {
@@ -37,4 +39,7 @@ public class Cat extends BaseEntity {
     @Column(name = "insulin_count", nullable = false)
     private int insulinCount;
 
+    public void assignInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
+    }
 }
