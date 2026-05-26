@@ -81,9 +81,9 @@ public class AuthService {
             throw new IllegalArgumentException("Refresh Token이 만료되었습니다.");
         }
 
-        String newAccessToken = jwtProvider.createAccessToken(user.getUserId()); // 새 Access Token 발급
+        String newAccessToken = jwtProvider.createAccessToken(user.getId()); // 새 Access Token 발급
 
-        return new TokenRefreshResponse(newAccessToken, user.getUserId()); // 명세에 맞게 accessToken + userId 반환
+        return new TokenRefreshResponse(newAccessToken, user.getId()); // 명세에 맞게 accessToken + userId 반환
     }
 
     @Transactional
@@ -92,6 +92,7 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.clearRefreshToken(); // DB에 저장된 refresh token 제거
+        user.deactivateApnsToken(); // device token 비활성화
     }
 
     public OnboardingStatusResponse getOnboardingStatus(UUID userId) {
@@ -117,8 +118,8 @@ public class AuthService {
         User user = userRepository.findByProviderAndProviderId(provider, providerId)
                 .orElseGet(()->userRepository.save(User.createSocialUser(provider, providerId)));
 
-        String accessToken = jwtProvider.createAccessToken(user.getUserId());
-        String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+        String accessToken = jwtProvider.createAccessToken(user.getId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
         Instant refreshTokenExpiresAt = jwtProvider.getExpiration(refreshToken);
 
         user.updateRefreshToken(refreshToken, refreshTokenExpiresAt);

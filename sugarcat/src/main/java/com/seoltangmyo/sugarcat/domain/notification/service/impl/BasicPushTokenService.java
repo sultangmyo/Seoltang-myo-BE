@@ -1,0 +1,33 @@
+package com.seoltangmyo.sugarcat.domain.notification.service.impl;
+
+import com.seoltangmyo.sugarcat.domain.notification.dto.DeviceTokenRequest;
+import com.seoltangmyo.sugarcat.domain.notification.service.PushTokenService;
+import com.seoltangmyo.sugarcat.domain.notification.type.PlatformType;
+import com.seoltangmyo.sugarcat.domain.user.entity.User;
+import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class BasicPushTokenService implements PushTokenService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    @Transactional
+    public void registerDeviceToken(UUID userId, DeviceTokenRequest request) {
+
+        if (request.platform() != PlatformType.IOS) {
+            throw new IllegalArgumentException("지원하지 않는 플랫폼입니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.updateApnsDeviceToken(request.deviceToken());
+    }
+}

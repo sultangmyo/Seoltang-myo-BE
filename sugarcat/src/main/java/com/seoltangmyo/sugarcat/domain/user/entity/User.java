@@ -1,6 +1,7 @@
 package com.seoltangmyo.sugarcat.domain.user.entity;
 
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
+import com.seoltangmyo.sugarcat.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -23,12 +23,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID userId;
+public class User extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id")
@@ -65,6 +60,12 @@ public class User {
     @Column(name = "refresh_token_expires_at")
     private Instant refreshTokenExpiresAt;
 
+    @Column(name = "apns_device_token", length = 500)
+    private String apnsDeviceToken;
+
+    @Column(name = "apns_token_active", nullable = false)
+    private boolean apnsTokenActive;
+
 
     // 비즈니스 메서드
 
@@ -90,6 +91,7 @@ public class User {
         user.weeklyReportNotificationEnabled = false;
 
         user.onboardingCompleted = false;
+        user.apnsTokenActive = false;
 
         return user;
     }
@@ -98,24 +100,29 @@ public class User {
         this.onboardingCompleted = true;
     }
 
-    // 닉네임 수정 (온보딩 초기 설정 및 마이페이지 수정 공용)
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
+    public void updateApnsDeviceToken(String apnsDeviceToken) {
+        this.apnsDeviceToken = apnsDeviceToken;
+        this.apnsTokenActive = true;
     }
 
-    // 알림 전체 설정 (온보딩에서 허용/거부 시 4가지 알림 일괄 적용)
-    // notificationEnabled = true  → 인슐린/혈당/식사/주간리포트 전부 ON
-    // notificationEnabled = false → 전부 OFF
-    public void updateNotification(boolean notificationEnabled) {
-        this.insulinNotiEnabled = notificationEnabled;
-        this.bloodSugarNotiEnabled = notificationEnabled;
-        this.mealNotiEnabled = notificationEnabled;
-        this.weeklyReportNotificationEnabled = notificationEnabled;
+    public void deactivateApnsToken() {
+        this.apnsTokenActive = false;
     }
 
-    // 고양이 연결 (신규 고양이 등록 또는 공동 집사 합류 시 catId 매핑)
-    public void assignCat(Cat cat) {
-        this.cat = cat;
+    // 알림 허용 판단
+    public boolean canReceiveInsulinNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && insulinNotiEnabled;
     }
 
+    public boolean canReceiveBloodSugarNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && bloodSugarNotiEnabled;
+    }
+
+    public boolean canReceiveMealNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && mealNotiEnabled;
+    }
+
+    public boolean canReceiveWeeklyReportNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && weeklyReportNotificationEnabled;
+    }
 }

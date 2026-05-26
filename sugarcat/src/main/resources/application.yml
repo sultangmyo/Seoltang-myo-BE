@@ -12,6 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        highlight_sql: true
         default_batch_fetch_size: 100
 
 # 서버 설정
@@ -23,4 +24,4 @@ server:
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
+    org.hibernate.orm.jdbc.bind: trace

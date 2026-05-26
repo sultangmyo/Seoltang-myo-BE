@@ -1,7 +1,7 @@
 -- ===========================
 -- DROP TABLES
 -- ===========================
-DROP TABLE IF EXISTS blood_sugar_statistics;
+DROP TABLE IF EXISTS blood_sugar_statistics; -- 추후에 삭제
 DROP TABLE IF EXISTS insulin_records;
 DROP TABLE IF EXISTS meal_records;
 DROP TABLE IF EXISTS blood_sugar_records;
@@ -11,14 +11,13 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS cats;
 
 -- ===========================
--- DROP ENUM TYPES
+-- DROP ENUM TYPES (추후에 삭제 예정)
 -- ===========================
 DROP TYPE IF EXISTS period_type_enum;
 DROP TYPE IF EXISTS meal_status_enum;
 DROP TYPE IF EXISTS sugar_status_enum;
 DROP TYPE IF EXISTS schedule_type_enum;
 DROP TYPE IF EXISTS provider_type_enum;
-
 
 
 -- =========================================
@@ -35,7 +34,9 @@ CREATE TABLE cats
     invite_code         VARCHAR(50) UNIQUE,
     meal_count          INT         NOT NULL CHECK (meal_count BETWEEN 1 AND 4),
     blood_sugar_count   INT         NOT NULL CHECK (blood_sugar_count BETWEEN 1 AND 8),
-    insulin_count       INT         NOT NULL CHECK (insulin_count BETWEEN 1 AND 3)
+    insulin_count       INT         NOT NULL CHECK (insulin_count BETWEEN 1 AND 3),
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =========================================
@@ -58,6 +59,10 @@ CREATE TABLE users
     provider_id                         VARCHAR(100) NOT NULL,
     refresh_token                       VARCHAR(500),
     refresh_token_expires_at            TIMESTAMPTZ,
+    apns_device_token                   VARCHAR(500),
+    apns_token_active                   BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_users_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -79,6 +84,8 @@ CREATE TABLE care_schedules
     schedule_type VARCHAR(20) NOT NULL,
     sequence       INT                NOT NULL CHECK (sequence >= 1),
     scheduled_time TIME               NOT NULL,  -- 예시) HH:mm:ss
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_care_schedules_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -101,7 +108,9 @@ CREATE TABLE blood_sugar_records
     record_time         TIME              NOT NULL,
     sequence            INT               NOT NULL CHECK (sequence >= 1),
     sugar_value         INT               NOT NULL CHECK (sugar_value >= 0),
-    sugar_status VARCHAR(20) NOT NULL,
+    sugar_status        VARCHAR(20) NOT NULL,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_blood_sugar_records_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -127,7 +136,9 @@ CREATE TABLE meal_records
     record_date         DATE             NOT NULL,
     record_time         TIME             NOT NULL,
     sequence            INT              NOT NULL CHECK (sequence >= 1),
-    meal_status VARCHAR(20) NOT NULL,
+    meal_status         VARCHAR(20) NOT NULL,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_meal_records_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -153,6 +164,8 @@ CREATE TABLE insulin_records
     record_date         DATE    NOT NULL,
     sequence            INT     NOT NULL CHECK (sequence >= 1),
     is_injected         BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_insulin_records_cat
         FOREIGN KEY (cat_id) REFERENCES cats (id)
@@ -166,29 +179,6 @@ CREATE TABLE insulin_records
         UNIQUE (cat_id, record_date, sequence)
 );
 
--- =========================================
--- 8. blood_sugar_statistics
--- 그래프용 주간 / 월간 집계 데이터
--- 추후에 수정 예정
--- =========================================
-CREATE TABLE blood_sugar_statistics
-(
-    id           UUID PRIMARY KEY,
-    cat_id       UUID             NOT NULL,
-    period_type VARCHAR(20) NOT NULL,
-    target_date  DATE             NOT NULL,
-    avg_sugar    INT,
-    max_sugar    INT,
-    record_count INT              NOT NULL CHECK (record_count >= 0),
-
-    CONSTRAINT fk_blood_sugar_statistics_cat
-        FOREIGN KEY (cat_id) REFERENCES cats (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT uq_blood_sugar_statistics_cat_period_target
-        UNIQUE (cat_id, period_type, target_date) -- 같은 기간 데이터 중복 저장 방지
-);
-
 
 -- =========================================
 -- 인덱스 추가
@@ -198,4 +188,3 @@ CREATE INDEX idx_care_schedules_cat_id ON care_schedules (cat_id);
 CREATE INDEX idx_blood_sugar_records_cat_date ON blood_sugar_records (cat_id, record_date);
 CREATE INDEX idx_meal_records_cat_date ON meal_records (cat_id, record_date);
 CREATE INDEX idx_insulin_records_cat_date ON insulin_records (cat_id, record_date);
-CREATE INDEX idx_blood_sugar_statistics_cat_period_target ON blood_sugar_statistics (cat_id, period_type, target_date);
