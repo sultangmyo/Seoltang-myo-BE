@@ -4,11 +4,13 @@ import com.seoltangmyo.sugarcat.domain.user.dto.CatUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.dto.NicknameUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.NotificationUpdateRequest;
+import com.seoltangmyo.sugarcat.domain.user.dto.UserMeResponse;
 import com.seoltangmyo.sugarcat.domain.user.service.UserService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,17 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+
+    // 내 정보 조회 (닉네임 + 가족 집사 목록)
+    // GET /api/v1/users/me
+    @GetMapping
+    public ResponseEntity<UserMeResponse> getUserMe(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        UserMeResponse response = userService.getUserMe(userId);
+        return ResponseEntity.ok(response);
+    }
 
     // 닉네임 수정
     // PATCH /api/v1/users/me/nickname
