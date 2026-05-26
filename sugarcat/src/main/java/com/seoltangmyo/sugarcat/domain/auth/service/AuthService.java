@@ -7,10 +7,10 @@ import com.seoltangmyo.sugarcat.domain.user.entity.ProviderType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import com.seoltangmyo.sugarcat.global.security.jwt.JwtProvider;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -104,11 +104,14 @@ public class AuthService {
     }
 
     @Transactional
-    public void completeOnboarding(UUID userId) {
+    public OnboardingCompleteResponse completeOnboarding(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.completeOnboarding();
+
+        // 명세: { "message": "온보딩이 완료되었습니다.", "onboardingCompleted": true }
+        return new OnboardingCompleteResponse("온보딩이 완료되었습니다.", true);
     }
   
     private SocialLoginResponse loginOrSignUp(ProviderType provider, String providerId) {

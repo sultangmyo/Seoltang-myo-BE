@@ -2,6 +2,7 @@ package com.seoltangmyo.sugarcat.domain.auth.controller;
 
 import com.seoltangmyo.sugarcat.domain.auth.dto.AppleLoginRequest;
 import com.seoltangmyo.sugarcat.domain.auth.dto.KakaoLoginRequest;
+import com.seoltangmyo.sugarcat.domain.auth.dto.OnboardingCompleteResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.OnboardingStatusResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
@@ -70,12 +71,15 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    // 온보딩 완료 저장
+    // POST /api/v1/auth/onboarding
+    // 온보딩 마지막 단계: onboardingCompleted = true 로 저장 후 홈 화면 이동
     @PostMapping("/onboarding")
-    public ResponseEntity<Void> completeOnboarding(
+    public ResponseEntity<OnboardingCompleteResponse> completeOnboarding(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
-        authService.completeOnboarding(userId);
-        return ResponseEntity.noContent().build();
+        OnboardingCompleteResponse response = authService.completeOnboarding(userId);
+        return ResponseEntity.ok(response);
     }
 }
