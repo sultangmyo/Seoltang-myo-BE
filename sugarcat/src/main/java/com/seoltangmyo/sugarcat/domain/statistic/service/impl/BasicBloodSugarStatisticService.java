@@ -3,6 +3,7 @@ package com.seoltangmyo.sugarcat.domain.statistic.service.impl;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.BloodSugarRecord;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.repository.BloodSugarRecordRepository;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
+import com.seoltangmyo.sugarcat.domain.statistic.dto.BloodSugarMonthlyStatisticsResponse;
 import com.seoltangmyo.sugarcat.domain.statistic.dto.BloodSugarWeeklyStatisticsResponse;
 import com.seoltangmyo.sugarcat.domain.statistic.service.BloodSugarStatisticService;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class BasicBloodSugarStatisticService implements BloodSugarStatisticService {
 
     private static final String WEEKLY = "weekly";
+    private static final String MONTHLY = "monthly";
 
     private final UserRepository userRepository;
     private final BloodSugarRecordRepository bloodSugarRecordRepository;
@@ -33,7 +35,7 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
             String period,
             LocalDate startDate
     ) {
-        validatePeriod(period);
+        validateWeeklyPeriod(period);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -73,14 +75,107 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
             LocalDate date,
             List<BloodSugarRecord> records
     ) {
+        DailyBloodSugarStatistics statistics = calculateStatistics(records);
+
+        return new BloodSugarWeeklyStatisticsResponse.Record(
+                convertDayOfWeek(date),
+                statistics.avg(),
+                statistics.min(),
+                statistics.max(),
+                statistics.count()
+        );
+    }
+
+    private String convertDayOfWeek(LocalDate date) {
+        return switch (date.getDayOfWeek()) {
+            case MONDAY -> "MON";
+            case TUESDAY -> "TUE";
+            case WEDNESDAY -> "WED";
+            case THURSDAY -> "THU";
+            case FRIDAY -> "FRI";
+            case SATURDAY -> "SAT";
+            case SUNDAY -> "SUN";
+        };
+    }
+
+    private void validateWeeklyPeriod(String period) {
+        if (!WEEKLY.equalsIgnoreCase(period)) {
+            throw new IllegalArgumentException("period는 weekly만 가능합니다.");
+        }
+    }
+
+
+    @Override
+    public BloodSugarMonthlyStatisticsResponse getMonthlyStatistics(
+            UUID userId,
+            String period,
+            LocalDate date
+    ) {
+        validateMonthlyPeriod(period);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+
+        LocalDate monthStartDate = date.withDayOfMonth(1);
+        LocalDate monthEndDate = date.withDayOfMonth(date.lengthOfMonth());
+
+        List<BloodSugarRecord> records =
+                bloodSugarRecordRepository.findAllByCatAndRecordDateBetween(
+                        cat,
+                        monthStartDate,
+                        monthEndDate
+                );
+
+        Map<LocalDate, List<BloodSugarRecord>> recordMap =
+                records.stream()
+                        .collect(Collectors.groupingBy(BloodSugarRecord::getRecordDate));
+
+        List<BloodSugarMonthlyStatisticsResponse.Record> monthlyRecords =
+                monthStartDate.datesUntil(monthEndDate.plusDays(1))
+                        .map(currentDate -> createMonthlyDailyStatistics(
+                                currentDate,
+                                recordMap.getOrDefault(currentDate, List.of())
+                        ))
+                        .toList();
+
+        return new BloodSugarMonthlyStatisticsResponse(
+                "MONTHLY",
+                monthStartDate.getYear(),
+                monthStartDate.getMonthValue(),
+                monthStartDate,
+                monthEndDate,
+                monthlyRecords
+        );
+    }
+
+    private BloodSugarMonthlyStatisticsResponse.Record createMonthlyDailyStatistics(
+            LocalDate date,
+            List<BloodSugarRecord> records
+    ) {
+        DailyBloodSugarStatistics statistics = calculateStatistics(records);
+
+        return new BloodSugarMonthlyStatisticsResponse.Record(
+                date,
+                date.getDayOfMonth(),
+                statistics.avg(),
+                statistics.min(),
+                statistics.max(),
+                statistics.count()
+        );
+    }
+
+    private void validateMonthlyPeriod(String period) {
+        if (!MONTHLY.equalsIgnoreCase(period)) {
+            throw new IllegalArgumentException("period는 monthly만 가능합니다.");
+        }
+    }
+
+    // 공통 계산 메서드
+    private DailyBloodSugarStatistics calculateStatistics(List<BloodSugarRecord> records) {
         if (records.isEmpty()) {
-            return new BloodSugarWeeklyStatisticsResponse.Record(
-                    convertDayOfWeek(date),
-                    null,
-                    null,
-                    null,
-                    0
-            );
+            return new DailyBloodSugarStatistics(null, null, null, 0);
         }
 
         int avg = (int) Math.round(
@@ -100,32 +195,19 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
                 .max()
                 .orElse(0);
 
-        int count = records.size();
-
-        return new BloodSugarWeeklyStatisticsResponse.Record(
-                convertDayOfWeek(date),
+        return new DailyBloodSugarStatistics(
                 avg,
                 min,
                 max,
-                count
+                records.size()
         );
     }
 
-    private String convertDayOfWeek(LocalDate date) {
-        return switch (date.getDayOfWeek()) {
-            case MONDAY -> "MON";
-            case TUESDAY -> "TUE";
-            case WEDNESDAY -> "WED";
-            case THURSDAY -> "THU";
-            case FRIDAY -> "FRI";
-            case SATURDAY -> "SAT";
-            case SUNDAY -> "SUN";
-        };
-    }
-
-    private void validatePeriod(String period) {
-        if (!WEEKLY.equalsIgnoreCase(period)) {
-            throw new IllegalArgumentException("period는 weekly만 가능합니다.");
-        }
+    private record DailyBloodSugarStatistics(
+            Integer avg,
+            Integer min,
+            Integer max,
+            int count
+    ) {
     }
 }
