@@ -92,6 +92,7 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.clearRefreshToken(); // DB에 저장된 refresh token 제거
+        user.deactivateApnsToken(); // device token 비활성화
     }
 
     public OnboardingStatusResponse getOnboardingStatus(UUID userId) {

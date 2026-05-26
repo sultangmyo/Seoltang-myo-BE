@@ -1,6 +1,7 @@
 package com.seoltangmyo.sugarcat.domain.bloodsugar.repository;
 
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.BloodSugarRecord;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.SugarStatus;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -20,4 +21,22 @@ public interface BloodSugarRecordRepository extends JpaRepository<BloodSugarReco
             Cat cat,
             LocalDate localDate,
             int sequence);
+
+    // 해당 날짜 + 순번 기록이 있는지 확인
+    boolean existsByCatAndRecordDateAndSequence(Cat cat, LocalDate recordDate, int sequence);
+
+    // 기간 내 전체 혈당 기록 개수
+    long countByCatAndRecordDateBetween(
+            Cat cat,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
+    // 기간 내 상태 별 혈당 기록 개수
+    long countByCatAndRecordDateBetweenAndSugarStatus(
+            Cat cat,
+            LocalDate startDate,
+            LocalDate endDate,
+            SugarStatus sugarStatus
+    );
 }
