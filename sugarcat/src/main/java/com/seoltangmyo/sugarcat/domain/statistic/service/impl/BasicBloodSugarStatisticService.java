@@ -31,7 +31,7 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
     public BloodSugarWeeklyStatisticsResponse getWeeklyStatistics(
             UUID userId,
             String period,
-            LocalDate date
+            LocalDate startDate
     ) {
         validatePeriod(period);
 
@@ -40,7 +40,6 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
 
         Cat cat = user.getCat();
 
-        LocalDate startDate = date;
         LocalDate endDate = startDate.plusDays(6);
 
         List<BloodSugarRecord> records =
