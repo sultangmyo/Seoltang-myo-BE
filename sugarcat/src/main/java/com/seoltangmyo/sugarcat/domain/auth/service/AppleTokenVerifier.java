@@ -28,7 +28,7 @@ public class AppleTokenVerifier {
     private final AppleApiClient appleApiClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${oauth2.apple.client-id}")
+    @Value("${apple.login.client-id}")
     private String appleClientId;
 
     public String verifyAndExtractSubject(String identityToken) {

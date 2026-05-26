@@ -1,6 +1,7 @@
 package com.seoltangmyo.sugarcat.domain.user.entity;
 
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
+import com.seoltangmyo.sugarcat.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -23,12 +23,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID userId;
+public class User extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id")
@@ -65,6 +60,12 @@ public class User {
     @Column(name = "refresh_token_expires_at")
     private Instant refreshTokenExpiresAt;
 
+    @Column(name = "apns_device_token", length = 500)
+    private String apnsDeviceToken;
+
+    @Column(name = "apns_token_active", nullable = false)
+    private boolean apnsTokenActive;
+
 
     // 비즈니스 메서드
 
@@ -90,12 +91,22 @@ public class User {
         user.weeklyReportNotificationEnabled = false;
 
         user.onboardingCompleted = false;
+        user.apnsTokenActive = false;
 
         return user;
     }
   
     public void completeOnboarding() {
         this.onboardingCompleted = true;
+    }
+
+    public void updateApnsDeviceToken(String apnsDeviceToken) {
+        this.apnsDeviceToken = apnsDeviceToken;
+        this.apnsTokenActive = true;
+    }
+
+    public void deactivateApnsToken() {
+        this.apnsTokenActive = false;
     }
 
 }

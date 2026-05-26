@@ -23,6 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("유저 없음"));
 
-        return new CustomUserDetails(user.getUserId(), user.getNickname());
+        return new CustomUserDetails(user.getId(), user.getNickname());
     }
 }
