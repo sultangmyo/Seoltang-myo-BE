@@ -1,7 +1,7 @@
 -- ===========================
 -- DROP TABLES
 -- ===========================
-DROP TABLE IF EXISTS blood_sugar_statistics;
+DROP TABLE IF EXISTS blood_sugar_statistics; -- 추후에 삭제
 DROP TABLE IF EXISTS insulin_records;
 DROP TABLE IF EXISTS meal_records;
 DROP TABLE IF EXISTS blood_sugar_records;
@@ -179,31 +179,6 @@ CREATE TABLE insulin_records
         UNIQUE (cat_id, record_date, sequence)
 );
 
--- =========================================
--- 8. blood_sugar_statistics
--- 그래프용 주간 / 월간 집계 데이터
--- 추후에 수정 예정
--- =========================================
-CREATE TABLE blood_sugar_statistics
-(
-    id           UUID PRIMARY KEY,
-    cat_id       UUID             NOT NULL,
-    period_type VARCHAR(20) NOT NULL,
-    target_date  DATE             NOT NULL,
-    avg_sugar    INT,
-    max_sugar    INT,
-    record_count INT              NOT NULL CHECK (record_count >= 0),
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_blood_sugar_statistics_cat
-        FOREIGN KEY (cat_id) REFERENCES cats (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT uq_blood_sugar_statistics_cat_period_target
-        UNIQUE (cat_id, period_type, target_date) -- 같은 기간 데이터 중복 저장 방지
-);
-
 
 -- =========================================
 -- 인덱스 추가
@@ -213,4 +188,3 @@ CREATE INDEX idx_care_schedules_cat_id ON care_schedules (cat_id);
 CREATE INDEX idx_blood_sugar_records_cat_date ON blood_sugar_records (cat_id, record_date);
 CREATE INDEX idx_meal_records_cat_date ON meal_records (cat_id, record_date);
 CREATE INDEX idx_insulin_records_cat_date ON insulin_records (cat_id, record_date);
-CREATE INDEX idx_blood_sugar_statistics_cat_period_target ON blood_sugar_statistics (cat_id, period_type, target_date);
