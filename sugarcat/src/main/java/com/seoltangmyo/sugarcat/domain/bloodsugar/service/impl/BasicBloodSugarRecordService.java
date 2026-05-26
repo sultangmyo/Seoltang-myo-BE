@@ -48,7 +48,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
         bloodSugarRecordRepository.save(bloodSugarRecord);
 
         return new BloodSugarRecordCreateResponse(
-                bloodSugarRecord.getBloodSugarRecordId(),
+                bloodSugarRecord.getId(),
                 bloodSugarRecord.getSugarStatus()
         );
     }
