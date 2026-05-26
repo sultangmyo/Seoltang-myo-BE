@@ -58,4 +58,20 @@ public class Cat extends BaseEntity {
         return cat;
     }
 
+    public void assignInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
+    }
+
+    public void updateMealCount(int mealCount) {
+        this.mealCount = mealCount;
+    }
+
+    public void updateBloodSugarCount(int bloodSugarCount) {
+        this.bloodSugarCount = bloodSugarCount;
+    }
+
+    public void updateInsulinCount(int insulinCount) {
+        this.insulinCount = insulinCount;
+    }
+
 }

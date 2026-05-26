@@ -1,6 +1,8 @@
 package com.seoltangmyo.sugarcat.domain.cat.controller;
 
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
+import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
@@ -8,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -21,6 +26,41 @@ import java.util.UUID;
 public class CatController {
 
     private final CatService catService;
+
+    // 초대코드 조회
+    // GET /api/v1/cats/me/invite-code
+    @GetMapping("/me/invite-code")
+    public ResponseEntity<InviteCodeResponse> getInviteCode(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        InviteCodeResponse response = catService.getInviteCode(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 초대코드 생성 (재생성)
+    // PATCH /api/v1/cats/me/invite-code
+    @PatchMapping("/me/invite-code")
+    public ResponseEntity<InviteCodeResponse> generateInviteCode(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        InviteCodeResponse response = catService.generateInviteCode(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 초대코드 유효성 검증
+    // GET /api/v1/cats/invite?code={inviteCode}
+    // 온보딩 3-B 단계: 초대코드 검증 후 고양이 이름·ID 반환 → 프론트 합류 확인 팝업 표시
+    // 실제 합류(catId 저장)는 PATCH /api/v1/users/me/cat 에서 처리
+    @GetMapping("/invite")
+    public ResponseEntity<InviteCodeValidateResponse> validateInviteCode(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("code") String inviteCode
+    ) {
+        InviteCodeValidateResponse response = catService.validateInviteCode(inviteCode);
+        return ResponseEntity.ok(response);
+    }
 
     // 고양이 신규 등록
     // POST /api/v1/cats

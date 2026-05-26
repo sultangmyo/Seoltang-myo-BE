@@ -1,5 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.cat.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,8 +16,8 @@ public record CatCreateRequest(
     // 고양이 기본 정보
     public record CatInfo(
             String name,           // 고양이 이름 (최대 10자)
-            LocalDate birthDate,   // 생년월일 (null 허용 - 프론트에서 "모르겠어요" 선택 시 null)
-            LocalDate diagnosedDate, // 당뇨 진단일 (필수)
+            @JsonFormat(pattern = "yyyy-MM-dd") LocalDate birthDate,   // 생년월일 (null 허용 - 프론트에서 "모르겠어요" 선택 시 null)
+            @JsonFormat(pattern = "yyyy-MM-dd") LocalDate diagnosedDate, // 당뇨 진단일 (필수)
             int mealCount,         // 식사 횟수
             int bloodSugarCount,   // 혈당 체크 횟수
             int insulinCount       // 인슐린 투여 횟수

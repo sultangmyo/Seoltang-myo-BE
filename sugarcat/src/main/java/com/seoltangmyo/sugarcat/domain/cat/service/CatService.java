@@ -1,6 +1,8 @@
 package com.seoltangmyo.sugarcat.domain.cat.service;
 
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
+import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.cat.repository.CatRepository;
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareSchedule;
@@ -11,12 +13,15 @@ import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +63,62 @@ public class CatService {
         saveSchedules(cat, CareScheduleType.INSULIN, request.insulin().schedules());
 
         return new MessageResponse("고양이 기본 정보가 생성되었습니다.");
+    }
+
+    private static final String INVITE_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int INVITE_CODE_LENGTH = 8;
+
+    // 초대코드 조회
+    // GET /api/v1/cats/me/invite-code
+    @Transactional
+    public InviteCodeResponse getInviteCode(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+        if (cat == null) {
+            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+        }
+
+        return new InviteCodeResponse(cat.getInviteCode());
+    }
+
+    // 초대코드 생성 (재생성 시 기존 코드 즉시 무효화)
+    // PATCH /api/v1/cats/me/invite-code
+    @Transactional
+    public InviteCodeResponse generateInviteCode(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+        if (cat == null) {
+            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+        }
+
+        String newCode = createRandomCode();
+        cat.assignInviteCode(newCode);
+
+        return new InviteCodeResponse(newCode);
+    }
+
+    private String createRandomCode() {
+        StringBuilder sb = new StringBuilder(INVITE_CODE_LENGTH);
+        for (int i = 0; i < INVITE_CODE_LENGTH; i++) {
+            int idx = ThreadLocalRandom.current().nextInt(INVITE_CODE_CHARS.length());
+            sb.append(INVITE_CODE_CHARS.charAt(idx));
+        }
+        return sb.toString();
+    }
+
+    // 초대코드 유효성 검증
+    // GET /api/v1/cats/invite?code={inviteCode}
+    // 유효하지 않은 초대코드면 401 반환
+    @Transactional
+    public InviteCodeValidateResponse validateInviteCode(String inviteCode) {
+        Cat cat = catRepository.findByInviteCode(inviteCode)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "초대코드가 존재하지 않습니다."));
+
+        return new InviteCodeValidateResponse(cat.getId(), cat.getName());
     }
 
     // 루틴 스케줄 저장 헬퍼
