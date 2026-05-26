@@ -20,7 +20,8 @@ public interface BloodSugarRecordRepository extends JpaRepository<BloodSugarReco
     Optional<BloodSugarRecord> findByCatAndRecordDateAndSequence(
             Cat cat,
             LocalDate localDate,
-            int sequence);
+            int sequence
+    );
 
     // 해당 날짜 + 순번 기록이 있는지 확인
     boolean existsByCatAndRecordDateAndSequence(Cat cat, LocalDate recordDate, int sequence);
@@ -38,5 +39,11 @@ public interface BloodSugarRecordRepository extends JpaRepository<BloodSugarReco
             LocalDate startDate,
             LocalDate endDate,
             SugarStatus sugarStatus
+    );
+
+    List<BloodSugarRecord> findAllByCatAndRecordDateBetween(
+            Cat cat,
+            LocalDate startDate,
+            LocalDate endDate
     );
 }
