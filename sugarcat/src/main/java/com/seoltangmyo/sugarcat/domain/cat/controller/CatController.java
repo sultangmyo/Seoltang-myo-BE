@@ -1,5 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.cat.controller;
 
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
 import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -21,23 +22,23 @@ public class CatController {
 
     private final CatExportService catExportService;
 
-//    @GetMapping("/me/export")
-//    public ResponseEntity<CatExportResponse> exportRecords(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-//
-//            @RequestParam("startDate")
-//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-//            LocalDate startDate,
-//
-//            @RequestParam("endDate")
-//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-//            LocalDate endDate
-//    ) {
-//        UUID userId = userDetails.getUserId();
-//
-//        CatExportResponse response =
-//                catExportService.exportRecords(userId, startDate, endDate);
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @GetMapping("/me/export")
+    public ResponseEntity<CatExportResponse> exportRecords(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @RequestParam("startDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam("endDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        CatExportResponse response =
+                catExportService.exportRecords(userId, startDate, endDate);
+
+        return ResponseEntity.ok(response);
+    }
 }
