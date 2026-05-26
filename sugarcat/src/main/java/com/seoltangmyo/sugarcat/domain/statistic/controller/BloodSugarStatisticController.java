@@ -1,5 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.statistic.controller;
 
+import com.seoltangmyo.sugarcat.domain.statistic.dto.BloodSugarMonthlyStatisticsResponse;
 import com.seoltangmyo.sugarcat.domain.statistic.dto.BloodSugarWeeklyStatisticsResponse;
 import com.seoltangmyo.sugarcat.domain.statistic.service.BloodSugarStatisticService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
@@ -35,6 +36,23 @@ public class BloodSugarStatisticController {
 
         BloodSugarWeeklyStatisticsResponse response =
                 bloodSugarStatisticService.getWeeklyStatistics(userId, period, date);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/monthly")
+    public ResponseEntity<BloodSugarMonthlyStatisticsResponse> getMonthlyStatistics(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("period") String period,
+
+            @RequestParam("date")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        BloodSugarMonthlyStatisticsResponse response =
+                bloodSugarStatisticService.getMonthlyStatistics(userId, period, date);
 
         return ResponseEntity.ok(response);
     }
