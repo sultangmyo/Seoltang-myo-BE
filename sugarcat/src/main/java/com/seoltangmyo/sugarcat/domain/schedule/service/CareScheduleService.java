@@ -30,7 +30,13 @@ public class CareScheduleService {
     // 케어 스케줄 조회 (식사 / 혈당 / 인슐린 공용)
     @Transactional
     public CareScheduleInfoResponse getSchedules(UUID userId, CareScheduleType type) {
-        Cat cat = getCat(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+        if (cat == null) {
+            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+        }
 
         List<CareSchedule> schedules =
                 careScheduleRepository.findAllByCatAndScheduleTypeOrderBySequenceAsc(cat, type);
@@ -87,14 +93,4 @@ public class CareScheduleService {
         return new MessageResponse(message);
     }
 
-    private Cat getCat(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        Cat cat = user.getCat();
-        if (cat == null) {
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
-        }
-        return cat;
-    }
 }
