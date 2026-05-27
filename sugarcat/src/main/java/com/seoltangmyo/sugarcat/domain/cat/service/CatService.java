@@ -110,13 +110,18 @@ public class CatService {
         return sb.toString();
     }
 
-    // 초대코드 유효성 검증
+    // 초대코드 유효성 검증 + 공동 집사 합류
     // GET /api/v1/cats/invite?code={inviteCode}
-    // 유효하지 않은 초대코드면 401 반환
+    // 유효하지 않은 초대코드면 401 반환, 유효하면 user.catId 저장 후 고양이 정보 반환
     @Transactional
-    public InviteCodeValidateResponse validateInviteCode(String inviteCode) {
+    public InviteCodeValidateResponse validateInviteCode(UUID userId, String inviteCode) {
         Cat cat = catRepository.findByInviteCode(inviteCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "초대코드가 존재하지 않습니다."));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.assignCat(cat);
 
         return new InviteCodeValidateResponse(cat.getId(), cat.getName());
     }
