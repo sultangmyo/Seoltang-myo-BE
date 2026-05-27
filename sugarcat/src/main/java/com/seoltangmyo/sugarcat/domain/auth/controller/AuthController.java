@@ -28,7 +28,10 @@ public class AuthController {
     public ResponseEntity<SocialLoginResponse> appleLogin(
             @RequestBody AppleLoginRequest request
     ) {
+        log.info("body = {}", request);
+        log.info("##log## 컨트롤러 - 애플로그인 진입 ");
         SocialLoginResponse response = authService.appleLogin(request);
+        log.info("##log## 컨트롤러 - 애플로그인 종료");
         return ResponseEntity.ok(response);
     }
 
