@@ -49,16 +49,16 @@ public class CatController {
         return ResponseEntity.ok(response);
     }
 
-    // 초대코드 유효성 검증
+    // 초대코드 유효성 검증 + 공동 집사 합류
     // GET /api/v1/cats/invite?code={inviteCode}
-    // 온보딩 3-B 단계: 초대코드 검증 후 고양이 이름·ID 반환 → 프론트 합류 확인 팝업 표시
-    // 실제 합류(catId 저장)는 PATCH /api/v1/users/me/cat 에서 처리
+    // 유효하면 user.catId 저장 후 고양이 정보 반환, 유효하지 않으면 401
     @GetMapping("/invite")
     public ResponseEntity<InviteCodeValidateResponse> validateInviteCode(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("code") String inviteCode
     ) {
-        InviteCodeValidateResponse response = catService.validateInviteCode(inviteCode);
+        UUID userId = userDetails.getUserId();
+        InviteCodeValidateResponse response = catService.validateInviteCode(userId, inviteCode);
         return ResponseEntity.ok(response);
     }
 

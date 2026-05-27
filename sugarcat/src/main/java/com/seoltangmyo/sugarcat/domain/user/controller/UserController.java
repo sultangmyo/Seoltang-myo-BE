@@ -1,6 +1,5 @@
 package com.seoltangmyo.sugarcat.domain.user.controller;
 
-import com.seoltangmyo.sugarcat.domain.user.dto.CatUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.dto.NicknameUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.NotificationUpdateRequest;
@@ -62,17 +61,4 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 사용자 고양이 수정 (공동 집사 합류)
-    // PATCH /api/v1/users/me/cat
-    // 온보딩 3-B 단계: 초대코드 검증 + user.catId 저장을 한 번에 처리
-    // inviteCode가 유효하지 않으면 400 예외 → 프론트 에러 토스트
-    @PatchMapping("/cat")
-    public ResponseEntity<MessageResponse> updateCat(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CatUpdateRequest request
-    ) {
-        UUID userId = userDetails.getUserId();
-        MessageResponse response = userService.updateCat(userId, request);
-        return ResponseEntity.ok(response);
-    }
 }
