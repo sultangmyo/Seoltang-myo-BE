@@ -31,12 +31,28 @@ public class AuthService {
 
     @Transactional
     public SocialLoginResponse appleLogin(AppleLoginRequest request) {
+        log.info("##log## 서비스 - 애플로그인 진입 ");
         String identityToken = request.identityToken(); // 프론트가 보낸 Apple identity token
+
+        log.info("애플 토큰 null 여부 = {}", identityToken == null);
+        log.info("애플 토큰 길이 = {}", identityToken == null ? null : identityToken.length());
+        log.info("애플 토큰 앞부분 = {}",
+                identityToken == null ? null : identityToken.substring(0, Math.min(10, identityToken.length())));
+
+        log.info("##log## 서비스 - 애플 identityToken 검증 시작");
 
         // Apple JWKS 검증 후 sub 추출
         String providerId = extractAppleProviderId(identityToken); // Apple의 고유 식별값(sub)
 
-        return loginOrSignUp(APPLE, providerId); // 기존 유저 조회 또는 신규 판단 후 토큰 발급
+        log.info("##log## 서비스 - 애플 identityToken 검증 성공");
+        log.info("애플 providerId 추출 성공 여부 = {}", providerId != null);
+        log.info("애플 providerId 길이 = {}", providerId == null ? null : providerId.length());
+
+        SocialLoginResponse response = loginOrSignUp(APPLE, providerId);
+
+        log.info("##log## 서비스 - 애플로그인 종료 ");
+
+        return response;
     }
 
     @Transactional
@@ -47,6 +63,7 @@ public class AuthService {
         log.info("카카오 토큰 null 여부 = {}", kakaoAccessToken == null);
         log.info("카카오 토큰 길이 = {}", kakaoAccessToken == null ? null : kakaoAccessToken.length());
         log.info("카카오 토큰 앞부분 = {}", kakaoAccessToken == null ? null : kakaoAccessToken.substring(0, Math.min(10, kakaoAccessToken.length())));
+
         // 카카오 API 호출 후 user id 추출
         String providerId = extractKakaoProviderId(kakaoAccessToken); // 카카오의 고유 식별값(id)
 
