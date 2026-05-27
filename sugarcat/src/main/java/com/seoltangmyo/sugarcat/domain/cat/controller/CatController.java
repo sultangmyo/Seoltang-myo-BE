@@ -7,6 +7,7 @@ import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/cats")
 @RequiredArgsConstructor
@@ -70,6 +72,9 @@ public class CatController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CatCreateRequest request
     ) {
+        log.info("##log## 고양이등록 컨트롤러 - request = {}", request);
+        log.info("##log## 고양이등록 컨트롤러 - cat null 여부 = {}", request.cat() == null);
+
         UUID userId = userDetails.getUserId();
         MessageResponse response = catService.createCat(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
