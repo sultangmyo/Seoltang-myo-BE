@@ -104,11 +104,14 @@ public class AuthService {
     }
 
     @Transactional
-    public void completeOnboarding(UUID userId) {
+    public OnboardingCompleteResponse completeOnboarding(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.completeOnboarding();
+
+        // 명세: { "message": "온보딩이 완료되었습니다.", "onboardingCompleted": true }
+        return new OnboardingCompleteResponse("온보딩이 완료되었습니다.", true);
     }
   
     private SocialLoginResponse loginOrSignUp(ProviderType provider, String providerId) {
