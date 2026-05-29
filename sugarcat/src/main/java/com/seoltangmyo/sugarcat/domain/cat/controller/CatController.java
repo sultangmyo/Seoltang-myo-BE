@@ -45,8 +45,6 @@ public class CatController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/me/export")
-    public ResponseEntity<CatExportResponse> exportRecords(
     // 초대코드 생성 (재생성)
     // PATCH /api/v1/cats/me/invite-code
     @PatchMapping("/me/invite-code")
@@ -64,21 +62,9 @@ public class CatController {
     @GetMapping("/invite")
     public ResponseEntity<InviteCodeValidateResponse> validateInviteCode(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-
-            @RequestParam("startDate")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
-
-            @RequestParam("endDate")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate
             @RequestParam("code") String inviteCode
     ) {
         UUID userId = userDetails.getUserId();
-
-        CatExportResponse response =
-                catExportService.exportRecords(userId, startDate, endDate);
-
         InviteCodeValidateResponse response = catService.validateInviteCode(userId, inviteCode);
         return ResponseEntity.ok(response);
     }
@@ -97,5 +83,26 @@ public class CatController {
         UUID userId = userDetails.getUserId();
         MessageResponse response = catService.createCat(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @GetMapping("/me/export")
+    public ResponseEntity<CatExportResponse> exportRecords(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @RequestParam("startDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam("endDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        CatExportResponse response =
+                catExportService.exportRecords(userId, startDate, endDate);
+
+        return ResponseEntity.ok(response);
     }
 }
