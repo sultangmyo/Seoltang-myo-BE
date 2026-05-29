@@ -37,4 +37,41 @@ public class Cat extends BaseEntity {
     @Column(name = "insulin_count", nullable = false)
     private int insulinCount;
 
+    // 신규 고양이 등록 시 사용하는 정적 팩토리 메서드
+    // inviteCode는 생성 시점에 null → 추후 초대코드 발급 기능에서 채워질 예정
+    public static Cat create(
+            String name,
+            LocalDate birthDate,       // null 허용 (프론트에서 "모르겠어요" 선택 시 null 전달)
+            LocalDate diagnosedDate,
+            int mealCount,
+            int bloodSugarCount,
+            int insulinCount
+    ) {
+        Cat cat = new Cat();
+        cat.name = name;
+        cat.birthDate = birthDate;
+        cat.diagnosedDate = diagnosedDate;
+        cat.mealCount = mealCount;
+        cat.bloodSugarCount = bloodSugarCount;
+        cat.insulinCount = insulinCount;
+        // inviteCode는 별도 초대코드 발급 API에서 설정 예정
+        return cat;
+    }
+
+    public void assignInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
+    }
+
+    public void updateMealCount(int mealCount) {
+        this.mealCount = mealCount;
+    }
+
+    public void updateBloodSugarCount(int bloodSugarCount) {
+        this.bloodSugarCount = bloodSugarCount;
+    }
+
+    public void updateInsulinCount(int insulinCount) {
+        this.insulinCount = insulinCount;
+    }
+
 }

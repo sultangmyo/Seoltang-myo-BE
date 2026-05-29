@@ -35,4 +35,13 @@ public class InsulinRecord extends BaseEntity {
     @Column(name = "is_injected", nullable = false)
     private boolean isInjected = false;
 
+    public static InsulinRecord create(Cat cat, User recordedBy, LocalDate recordDate, int sequence, boolean isInjected) {
+        InsulinRecord insulinRecord = new InsulinRecord();
+        insulinRecord.cat = cat;
+        insulinRecord.recordedBy = recordedBy;
+        insulinRecord.recordDate = recordDate;
+        insulinRecord.sequence = sequence;
+        insulinRecord.isInjected = isInjected;
+        return insulinRecord;
+    }
 }

@@ -100,6 +100,21 @@ public class User extends BaseEntity {
         this.onboardingCompleted = true;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void assignCat(Cat cat) {
+        this.cat = cat;
+    }
+
+    public void updateNotification(boolean enabled) {
+        this.insulinNotiEnabled = enabled;
+        this.bloodSugarNotiEnabled = enabled;
+        this.mealNotiEnabled = enabled;
+        this.weeklyReportNotificationEnabled = enabled;
+    }
+
     public void updateApnsDeviceToken(String apnsDeviceToken) {
         this.apnsDeviceToken = apnsDeviceToken;
         this.apnsTokenActive = true;

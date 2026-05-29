@@ -5,6 +5,7 @@ import com.seoltangmyo.sugarcat.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ import java.time.LocalTime;
         }
 )
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CareSchedule extends BaseEntity {
@@ -38,5 +40,21 @@ public class CareSchedule extends BaseEntity {
 
     @Column(name = "scheduled_time", nullable = false)
     private LocalTime scheduledTime;
+
+    // 루틴 스케줄 생성 팩토리 메서드
+    // sequence는 프론트에서 전달한 값 그대로 저장 (1회차, 2회차 …)
+    public static CareSchedule create(
+            Cat cat,
+            CareScheduleType scheduleType,
+            int sequence,
+            LocalTime scheduledTime
+    ) {
+        CareSchedule schedule = new CareSchedule();
+        schedule.cat = cat;
+        schedule.scheduleType = scheduleType;
+        schedule.sequence = sequence;
+        schedule.scheduledTime = scheduledTime;
+        return schedule;
+    }
 
 }

@@ -5,7 +5,6 @@ import com.seoltangmyo.sugarcat.domain.meal.entity.MealRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 public interface MealRecordRepository extends JpaRepository<MealRecord, UUID> {
@@ -18,4 +17,7 @@ public interface MealRecordRepository extends JpaRepository<MealRecord, UUID> {
             LocalDate startDate,
             LocalDate endDate
     );
+
+    // 날짜별 식사 기록 조회 (순번 오름차순)
+    List<MealRecord> findAllByCatAndRecordDateOrderBySequenceAsc(Cat cat, LocalDate recordDate);
 }
