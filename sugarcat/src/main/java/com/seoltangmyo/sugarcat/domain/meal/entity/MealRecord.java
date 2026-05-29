@@ -40,4 +40,14 @@ public class MealRecord extends BaseEntity {
     @Column(name = "meal_status", length = 20, nullable = false)
     private MealStatus mealStatus;
 
+    public static MealRecord create(Cat cat, User recordedBy, LocalDate recordDate, LocalTime recordTime, int sequence, MealStatus mealStatus) {
+        MealRecord mealRecord = new MealRecord();
+        mealRecord.cat = cat;
+        mealRecord.recordedBy = recordedBy;
+        mealRecord.recordDate = recordDate;
+        mealRecord.recordTime = recordTime;
+        mealRecord.sequence = sequence;
+        mealRecord.mealStatus = mealStatus;
+        return mealRecord;
+    }
 }

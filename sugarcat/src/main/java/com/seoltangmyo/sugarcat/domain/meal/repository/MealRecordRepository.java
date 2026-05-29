@@ -18,4 +18,7 @@ public interface MealRecordRepository extends JpaRepository<MealRecord, UUID> {
             LocalDate startDate,
             LocalDate endDate
     );
+
+    // 날짜별 식사 기록 조회 (순번 오름차순)
+    List<MealRecord> findAllByCatAndRecordDateOrderBySequenceAsc(Cat cat, LocalDate recordDate);
 }
