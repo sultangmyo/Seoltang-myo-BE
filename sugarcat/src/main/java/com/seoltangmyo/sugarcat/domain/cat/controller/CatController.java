@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,17 +52,6 @@ public class CatController {
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(catService.updateCatInfo(userId, request));
-    }
-
-    // 고양이 삭제
-    // DELETE /api/v1/cats/me
-    // [추가: meaningGitt] 연관 기록(혈당·식사·인슐린·케어 스케줄) 전체 삭제 후 고양이 삭제
-    @DeleteMapping("/me")
-    public ResponseEntity<MessageResponse> deleteCat(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        UUID userId = userDetails.getUserId();
-        return ResponseEntity.ok(catService.deleteCat(userId));
     }
 
     // 초대코드 조회
