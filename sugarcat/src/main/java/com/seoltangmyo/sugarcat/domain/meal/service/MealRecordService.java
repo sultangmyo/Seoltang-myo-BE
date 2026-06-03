@@ -32,8 +32,12 @@ public class MealRecordService {
     // POST /api/v1/meals/me?date={date}&sequence={sequence}
     // 같은 날짜+순번 기록이 이미 있으면 예외 처리
     @Transactional
-    public MessageResponse createMealRecord(UUID userId, LocalDate date, int sequence, MealRecordCreateRequest request) {
-        log.info("[식사 기록 저장] userId={}, date={}, sequence={}, mealStatus={}", userId, date, sequence, request.mealStatus());
+    public MessageResponse createMealRecord(UUID userId, MealRecordCreateRequest request) {
+
+        LocalDate date = request.date();
+        int sequence = request.sequence();
+
+        log.info("[식사 기록 저장] userId={}, date={}, sequence={}, mealStatus={}", userId, request, sequence, request.mealStatus());
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

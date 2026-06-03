@@ -60,22 +60,20 @@ public class MealRecordController {
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createMealRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam("sequence") int sequence,
             @RequestBody MealRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 
         // 요청으로 들어온 값 확인
-        log.info("[MealRecordController] 식사 기록 저장 요청 - userId={}, date={}, sequence={}, request={}",
-                userId, date, sequence, request);
+        log.info("[MealRecordController] 식사 기록 저장 요청 - userId={}, request={}",
+                userId, request);
 
         // 서비스에서 식사 기록 저장
-        MessageResponse response = mealRecordService.createMealRecord(userId, date, sequence, request);
+        MessageResponse response = mealRecordService.createMealRecord(userId, request);
 
         // 응답으로 나가는 값 확인
-        log.info("[MealRecordController] 식사 기록 저장 응답 - userId={}, date={}, sequence={}, response={}",
-                userId, date, sequence, response);
+        log.info("[MealRecordController] 식사 기록 저장 응답 - userId={}, response={}",
+                userId, response);
 
         // 201 Created 응답 반환
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
