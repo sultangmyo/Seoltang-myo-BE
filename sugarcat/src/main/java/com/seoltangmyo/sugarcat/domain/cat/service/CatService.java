@@ -1,6 +1,5 @@
 package com.seoltangmyo.sugarcat.domain.cat.service;
 
-import com.seoltangmyo.sugarcat.domain.bloodsugar.repository.BloodSugarRecordRepository;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
@@ -8,8 +7,6 @@ import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.cat.repository.CatRepository;
-import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepository;
-import com.seoltangmyo.sugarcat.domain.meal.repository.MealRecordRepository;
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareSchedule;
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareScheduleType;
 import com.seoltangmyo.sugarcat.domain.schedule.repository.CareScheduleRepository;
@@ -37,9 +34,6 @@ public class CatService {
     private final CatRepository catRepository;
     private final CareScheduleRepository careScheduleRepository;
     private final UserRepository userRepository;
-    private final BloodSugarRecordRepository bloodSugarRecordRepository;
-    private final MealRecordRepository mealRecordRepository;
-    private final InsulinRecordRepository insulinRecordRepository;
 
     // 스케줄 시간 파싱 포맷 (프론트에서 "HH:mm" 형식으로 전달)
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -182,47 +176,6 @@ public class CatService {
         log.info("[고양이 정보 수정 완료] catId={}", cat.getId());
 
         return new MessageResponse("고양이 정보가 수정되었습니다.");
-    }
-
-    // 고양이 hard delete
-    // DELETE /api/v1/cats/me
-    // 다른 집사가 연결되어 있으면 삭제 불가 (요청한 사용자 외 다른 user.catId가 존재하면 400)
-    // 삭제 순서: 연관 기록 삭제 → 케어 스케줄 삭제 → 모든 집사 cat 참조 해제 → 고양이 삭제
-    @Transactional
-    public MessageResponse deleteCat(UUID userId) {
-        log.info("[고양이 삭제] userId={}", userId);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        Cat cat = user.getCat();
-
-        // 요청한 사용자 외 다른 집사가 연결되어 있으면 삭제 불가
-        List<User> members = userRepository.findAllByCat(cat);
-        boolean hasOtherMembers = members.stream()
-                .anyMatch(member -> !member.getId().equals(userId));
-        if (hasOtherMembers) {
-            log.warn("[고양이 삭제 실패] 다른 집사 존재 - catId={}, memberCount={}", cat.getId(), members.size());
-            throw new IllegalArgumentException("다른 집사가 연결되어 있어 고양이를 삭제할 수 없습니다.");
-        }
-
-        // 1. 연관 기록 삭제
-        bloodSugarRecordRepository.deleteAllByCat(cat);
-        mealRecordRepository.deleteAllByCat(cat);
-        insulinRecordRepository.deleteAllByCat(cat);
-
-        // 2. 케어 스케줄 삭제
-        careScheduleRepository.deleteAllByCat(cat);
-
-        // 3. 연결된 모든 집사 cat 참조 해제
-        members.forEach(User::detachCat);
-
-        // 4. 고양이 삭제
-        catRepository.delete(cat);
-
-        log.info("[고양이 삭제 완료] catId={}", cat.getId());
-
-        return new MessageResponse("고양이 정보가 삭제되었습니다.");
     }
 
     // 루틴 스케줄 저장 헬퍼
