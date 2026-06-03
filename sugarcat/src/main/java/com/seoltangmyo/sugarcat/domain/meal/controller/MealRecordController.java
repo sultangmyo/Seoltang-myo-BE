@@ -2,6 +2,7 @@ package com.seoltangmyo.sugarcat.domain.meal.controller;
 
 import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordListResponse;
+import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.meal.service.MealRecordService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,5 +52,16 @@ public class MealRecordController {
         UUID userId = userDetails.getUserId();
         MessageResponse response = mealRecordService.createMealRecord(userId, date, sequence, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // 식사 기록 수정
+    // PATCH /api/v1/meals/me
+    @PatchMapping("/me")
+    public ResponseEntity<MessageResponse> updateMealRecord(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody MealRecordUpdateRequest request
+    ) {
+        UUID userId = userDetails.getUserId();
+        return ResponseEntity.ok(mealRecordService.updateMealRecord(userId, request));
     }
 }
