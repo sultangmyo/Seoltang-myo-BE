@@ -1,6 +1,8 @@
 package com.seoltangmyo.sugarcat.domain.cat.controller;
 
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
@@ -28,6 +30,29 @@ import java.util.UUID;
 public class CatController {
 
     private final CatService catService;
+
+    // 고양이 기본 정보 조회
+    // GET /api/v1/cats/me
+    // [추가: meaningGitt] 홈뷰 헤더용 고양이 이름 · 진단일 반환
+    @GetMapping("/me")
+    public ResponseEntity<CatInfoResponse> getCatInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        return ResponseEntity.ok(catService.getCatInfo(userId));
+    }
+
+    // 고양이 기본 정보 수정
+    // PATCH /api/v1/cats/me
+    // [추가: meaningGitt] 마이페이지에서 이름 · 생년월일 · 진단일 수정
+    @PatchMapping("/me")
+    public ResponseEntity<MessageResponse> updateCatInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody CatInfoUpdateRequest request
+    ) {
+        UUID userId = userDetails.getUserId();
+        return ResponseEntity.ok(catService.updateCatInfo(userId, request));
+    }
 
     // 초대코드 조회
     // GET /api/v1/cats/me/invite-code

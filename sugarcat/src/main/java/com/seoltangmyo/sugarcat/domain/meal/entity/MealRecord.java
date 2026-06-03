@@ -50,4 +50,11 @@ public class MealRecord extends BaseEntity {
         mealRecord.mealStatus = mealStatus;
         return mealRecord;
     }
+
+    // 식사 기록 수정 (PATCH /api/v1/meals/me)
+    // date + sequence는 식별자로 사용하므로 수정 대상에서 제외
+    public void update(LocalTime recordTime, MealStatus mealStatus) {
+        this.recordTime = recordTime;
+        this.mealStatus = mealStatus;
+    }
 }
