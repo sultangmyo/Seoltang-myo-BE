@@ -7,6 +7,7 @@ import com.seoltangmyo.sugarcat.domain.meal.service.MealRecordService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/meals")
 @RequiredArgsConstructor
@@ -37,7 +39,20 @@ public class MealRecordController {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         UUID userId = userDetails.getUserId();
-        return ResponseEntity.ok(mealRecordService.getMealRecords(userId, date));
+
+        // 요청으로 들어온 값 확인
+        log.info("[MealRecordController] 식사 기록 조회 요청 - userId={}, date={}",
+                userId, date);
+
+        // 서비스에서 식사 기록 조회
+        MealRecordListResponse response = mealRecordService.getMealRecords(userId, date);
+
+        // 응답으로 나가는 값 확인
+        log.info("[MealRecordController] 식사 기록 조회 응답 - userId={}, date={}, response={}",
+                userId, date, response);
+
+        // 200 OK 응답 반환
+        return ResponseEntity.ok(response);
     }
 
     // 식사 기록 저장
@@ -50,7 +65,19 @@ public class MealRecordController {
             @RequestBody MealRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
+
+        // 요청으로 들어온 값 확인
+        log.info("[MealRecordController] 식사 기록 저장 요청 - userId={}, date={}, sequence={}, request={}",
+                userId, date, sequence, request);
+
+        // 서비스에서 식사 기록 저장
         MessageResponse response = mealRecordService.createMealRecord(userId, date, sequence, request);
+
+        // 응답으로 나가는 값 확인
+        log.info("[MealRecordController] 식사 기록 저장 응답 - userId={}, date={}, sequence={}, response={}",
+                userId, date, sequence, response);
+
+        // 201 Created 응답 반환
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -62,6 +89,19 @@ public class MealRecordController {
             @RequestBody MealRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
-        return ResponseEntity.ok(mealRecordService.updateMealRecord(userId, request));
+
+        // 요청으로 들어온 값 확인
+        log.info("[MealRecordController] 식사 기록 수정 요청 - userId={}, request={}",
+                userId, request);
+
+        // 서비스에서 식사 기록 수정
+        MessageResponse response = mealRecordService.updateMealRecord(userId, request);
+
+        // 응답으로 나가는 값 확인
+        log.info("[MealRecordController] 식사 기록 수정 응답 - userId={}, response={}",
+                userId, response);
+
+        // 200 OK 응답 반환
+        return ResponseEntity.ok(response);
     }
 }
