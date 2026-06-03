@@ -22,7 +22,7 @@ public class Cat extends BaseEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "diagnosed_date", nullable = false)
+    @Column(name = "diagnosed_date")
     private LocalDate diagnosedDate;
 
     @Column(name = "invite_code", length = 50)
@@ -72,6 +72,14 @@ public class Cat extends BaseEntity {
 
     public void updateInsulinCount(int insulinCount) {
         this.insulinCount = insulinCount;
+    }
+
+    // 고양이 기본 정보 수정 (PATCH /api/v1/cats/me)
+    // birthDate는 null 허용 (미입력 시 null 저장)
+    public void updateInfo(String name, LocalDate birthDate, LocalDate diagnosedDate) {
+        this.name = name;
+        this.birthDate = birthDate;
+        this.diagnosedDate = diagnosedDate;
     }
 
 }

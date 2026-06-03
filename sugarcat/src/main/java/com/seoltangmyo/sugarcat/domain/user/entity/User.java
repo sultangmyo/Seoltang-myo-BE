@@ -115,6 +115,23 @@ public class User extends BaseEntity {
         this.weeklyReportNotificationEnabled = enabled;
     }
 
+    // 알림 개별 수정 (PATCH /api/v1/users/me/notification?type={type})
+    // type: insulin / blood / meal / weekly
+    public void updateSingleNotification(String type, boolean enabled) {
+        switch (type) {
+            case "insulin" -> this.insulinNotiEnabled = enabled;
+            case "blood"   -> this.bloodSugarNotiEnabled = enabled;
+            case "meal"    -> this.mealNotiEnabled = enabled;
+            case "weekly"  -> this.weeklyReportNotificationEnabled = enabled;
+            default -> throw new IllegalArgumentException("알 수 없는 알림 타입입니다: " + type);
+        }
+    }
+
+    // 고양이 연결 해제 (고양이 삭제 시 연결된 사용자 cat 참조 null 처리)
+    public void detachCat() {
+        this.cat = null;
+    }
+
     public void updateApnsDeviceToken(String apnsDeviceToken) {
         this.apnsDeviceToken = apnsDeviceToken;
         this.apnsTokenActive = true;
