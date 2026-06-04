@@ -9,11 +9,11 @@ import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepositor
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -68,7 +68,7 @@ public class InsulinRecordService {
     // 날짜별 인슐린 투여 기록 조회
     // GET /api/v1/insulin-records/me?date={date}
     // nickName: 기록한 집사 닉네임, 탈퇴 시 "탈퇴한 사용자" 반환
-    @Transactional
+    @Transactional(readOnly = true)
     public InsulinRecordListResponse getInsulinRecords(UUID userId, LocalDate date) {
         log.info("[인슐린 기록 조회] userId={}, date={}", userId, date);
 
