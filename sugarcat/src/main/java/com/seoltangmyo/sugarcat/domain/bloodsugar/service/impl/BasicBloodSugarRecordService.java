@@ -3,6 +3,7 @@ package com.seoltangmyo.sugarcat.domain.bloodsugar.service.impl;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.*;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.BloodSugarRecord;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.SugarStatus;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.event.BloodSugarRecordCreatedEvent;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.repository.BloodSugarRecordRepository;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
@@ -10,6 +11,7 @@ import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +23,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBloodSugarRecordService implements BloodSugarRecordService {
+
     private final BloodSugarRecordRepository bloodSugarRecordRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -61,6 +65,9 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
         bloodSugarRecordRepository.save(bloodSugarRecord);
 
         log.info("[혈당 기록 저장 완료] recordId={}, sugarStatus={}", bloodSugarRecord.getId(), sugarStatus);
+
+        eventPublisher.publishEvent(new BloodSugarRecordCreatedEvent(bloodSugarRecord.getId()));
+        log.info("[혈당 기록 저장 이벤트 발행] recordId={}", bloodSugarRecord.getId());
 
         return new BloodSugarRecordCreateResponse(
                 bloodSugarRecord.getId(),
