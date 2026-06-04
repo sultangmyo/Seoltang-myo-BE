@@ -4,6 +4,7 @@ import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordListResponse;
 import com.seoltangmyo.sugarcat.domain.insulin.entity.InsulinRecord;
+import com.seoltangmyo.sugarcat.domain.insulin.event.InsulinRecordCreatedEvent;
 import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepository;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
@@ -11,6 +12,7 @@ import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +26,7 @@ public class InsulinRecordService {
 
     private final InsulinRecordRepository insulinRecordRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 인슐린 투여 기록 저장
     // POST /api/v1/insulin-records/me
@@ -55,6 +58,9 @@ public class InsulinRecordService {
         insulinRecordRepository.save(record);
 
         log.info("[인슐린 기록 저장 완료] recordId={}", record.getId());
+
+        eventPublisher.publishEvent(new InsulinRecordCreatedEvent(record.getId()));
+        log.info("[인슐린 기록 저장 이벤트 발행] recordId={}", record.getId());
 
         return new MessageResponse("인슐린 투여 기록이 저장되었습니다.");
     }
