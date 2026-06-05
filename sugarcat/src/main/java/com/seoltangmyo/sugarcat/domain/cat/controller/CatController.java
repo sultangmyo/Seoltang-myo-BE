@@ -77,9 +77,9 @@ public class CatController {
     }
 
     // 초대코드 유효성 검증 + 공동 집사 합류
-    // GET /api/v1/cats/invite?code={inviteCode}
+    // PATCH /api/v1/cats/invite?code={inviteCode}
     // 유효하면 user.catId 저장 후 고양이 정보 반환, 유효하지 않으면 401
-    @GetMapping("/invite")
+    @PatchMapping("/invite")
     public ResponseEntity<InviteCodeValidateResponse> validateInviteCode(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("code") String inviteCode
