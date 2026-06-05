@@ -1,6 +1,8 @@
 package com.seoltangmyo.sugarcat.domain.cat.service;
 
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
@@ -13,6 +15,7 @@ import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CatService {
@@ -40,6 +44,8 @@ public class CatService {
     // 3. 식사/혈당/인슐린 루틴 각각 저장 (schedules 빈 배열이면 해당 타입 row 미생성)
     @Transactional
     public MessageResponse createCat(UUID userId, CatCreateRequest request) {
+        log.info("[고양이 등록] userId={}", userId);
+
         // 1. 고양이 생성 및 저장
         Cat cat = Cat.create(
                 request.cat().name(),
@@ -62,6 +68,8 @@ public class CatService {
         saveSchedules(cat, CareScheduleType.BLOODSUGAR, request.bloodSugar().schedules());
         saveSchedules(cat, CareScheduleType.INSULIN, request.insulin().schedules());
 
+        log.info("[고양이 등록 완료] catId={}, catName={}", cat.getId(), cat.getName());
+
         return new MessageResponse("고양이 기본 정보가 생성되었습니다.");
     }
 
@@ -72,13 +80,14 @@ public class CatService {
     // GET /api/v1/cats/me/invite-code
     @Transactional
     public InviteCodeResponse getInviteCode(UUID userId) {
+        log.info("[초대코드 조회] userId={}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Cat cat = user.getCat();
-        if (cat == null) {
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
-        }
+
+        log.info("[초대코드 조회 완료] catId={}", cat.getId());
 
         return new InviteCodeResponse(cat.getInviteCode());
     }
@@ -87,16 +96,17 @@ public class CatService {
     // PATCH /api/v1/cats/me/invite-code
     @Transactional
     public InviteCodeResponse generateInviteCode(UUID userId) {
+        log.info("[초대코드 생성] userId={}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Cat cat = user.getCat();
-        if (cat == null) {
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
-        }
 
         String newCode = createRandomCode();
         cat.assignInviteCode(newCode);
+
+        log.info("[초대코드 생성 완료] catId={}", cat.getId());
 
         return new InviteCodeResponse(newCode);
     }
@@ -115,15 +125,57 @@ public class CatService {
     // 유효하지 않은 초대코드면 401 반환, 유효하면 user.catId 저장 후 고양이 정보 반환
     @Transactional
     public InviteCodeValidateResponse validateInviteCode(UUID userId, String inviteCode) {
+        log.info("[초대코드 검증] userId={}, inviteCode={}", userId, inviteCode);
+
         Cat cat = catRepository.findByInviteCode(inviteCode)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "초대코드가 존재하지 않습니다."));
+                .orElseThrow(() -> {
+                    log.warn("[초대코드 검증 실패] 존재하지 않는 코드 - inviteCode={}", inviteCode);
+                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "초대코드가 존재하지 않습니다.");
+                });
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.assignCat(cat);
 
+        log.info("[초대코드 검증 완료] userId={}, catId={}", userId, cat.getId());
+
         return new InviteCodeValidateResponse(cat.getId(), cat.getName());
+    }
+
+    // 고양이 기본 정보 조회
+    // GET /api/v1/cats/me
+    @Transactional
+    public CatInfoResponse getCatInfo(UUID userId) {
+        log.info("[고양이 정보 조회] userId={}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+
+        log.info("[고양이 정보 조회 완료] catId={}", cat.getId());
+
+        return new CatInfoResponse(cat.getName(), cat.getBirthDate(), cat.getDiagnosedDate());
+    }
+
+    // 고양이 기본 정보 수정
+    // PATCH /api/v1/cats/me
+    @Transactional
+    public MessageResponse updateCatInfo(UUID userId, CatInfoUpdateRequest request) {
+        log.info("[고양이 정보 수정] userId={}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Cat cat = user.getCat();
+
+        // 더티체킹으로 자동 반영
+        cat.updateInfo(request.name(), request.birthDate(), request.diagnosedDate());
+
+        log.info("[고양이 정보 수정 완료] catId={}", cat.getId());
+
+        return new MessageResponse("고양이 정보가 수정되었습니다.");
     }
 
     // 루틴 스케줄 저장 헬퍼

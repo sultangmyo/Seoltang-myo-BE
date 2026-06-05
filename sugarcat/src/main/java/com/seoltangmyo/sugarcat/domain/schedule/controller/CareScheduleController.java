@@ -7,6 +7,7 @@ import com.seoltangmyo.sugarcat.domain.schedule.service.CareScheduleService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/care_schedules/me")
 @RequiredArgsConstructor
@@ -51,7 +53,20 @@ public class CareScheduleController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
-        return ResponseEntity.ok(careScheduleService.getSchedules(userId, CareScheduleType.INSULIN));
+
+        // 요청으로 들어온 값 확인
+        log.info("[CareScheduleController] 인슐린 스케줄 조회 요청 - userId={}, scheduleType={}",
+                userId, CareScheduleType.INSULIN);
+
+        // 서비스에서 인슐린 스케줄 조회
+        CareScheduleInfoResponse response = careScheduleService.getSchedules(userId, CareScheduleType.INSULIN);
+
+        // 응답으로 나가는 값 확인
+        log.info("[CareScheduleController] 인슐린 스케줄 조회 응답 - userId={}, scheduleType={}, response={}",
+                userId, CareScheduleType.INSULIN, response);
+
+        // 200 OK 응답 반환
+        return ResponseEntity.ok(response);
     }
 
     // 식사 설정 수정

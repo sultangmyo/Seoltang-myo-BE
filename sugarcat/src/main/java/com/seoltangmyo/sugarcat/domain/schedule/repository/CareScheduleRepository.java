@@ -19,4 +19,7 @@ public interface CareScheduleRepository extends JpaRepository<CareSchedule, UUID
 
     // 고양이 + 타입별 스케줄 전체 삭제 (수정 시 기존 삭제 후 재저장)
     void deleteAllByCatAndScheduleType(Cat cat, CareScheduleType scheduleType);
+
+    // 고양이에 속한 모든 케어 스케줄 삭제 (고양이 hard delete 시 연관 데이터 정리용)
+    void deleteAllByCat(Cat cat);
 }
