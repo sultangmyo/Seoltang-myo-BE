@@ -1,5 +1,7 @@
 package com.seoltangmyo.sugarcat.domain.cat.controller;
 
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
@@ -9,6 +11,7 @@ import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Slf4j
@@ -29,6 +33,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CatController {
 
+    private final CatExportService catExportService;
     private final CatService catService;
 
     // 고양이 기본 정보 조회
@@ -103,5 +108,26 @@ public class CatController {
         UUID userId = userDetails.getUserId();
         MessageResponse response = catService.createCat(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @GetMapping("/me/export")
+    public ResponseEntity<CatExportResponse> exportRecords(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @RequestParam("startDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam("endDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        CatExportResponse response =
+                catExportService.exportRecords(userId, startDate, endDate);
+
+        return ResponseEntity.ok(response);
     }
 }

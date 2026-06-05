@@ -37,6 +37,7 @@ public class InsulinRecordService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Cat cat = user.getCat();
+
         if (cat == null) {
             log.warn("[인슐린 기록 저장 실패] 고양이 없음 - userId={}", userId);
             throw new IllegalArgumentException("등록된 고양이가 없습니다.");
@@ -45,13 +46,21 @@ public class InsulinRecordService {
         boolean exists = insulinRecordRepository.existsByCatAndRecordDateAndSequence(
                 cat, request.recordDate(), request.sequence()
         );
+
         if (exists) {
             log.warn("[인슐린 기록 저장 실패] 중복 기록 - catId={}, date={}, sequence={}",
                     cat.getId(), request.recordDate(), request.sequence());
             throw new IllegalArgumentException("이미 해당 순번의 인슐린 기록이 존재합니다.");
         }
 
-        InsulinRecord record = InsulinRecord.create(cat, user, request.recordDate(), request.sequence(), request.isInjected());
+        InsulinRecord record = InsulinRecord.create(
+                cat,
+                user,
+                request.recordDate(),
+                request.sequence(),
+                request.isInjected()
+        );
+
         insulinRecordRepository.save(record);
 
         log.info("[인슐린 기록 저장 완료] recordId={}", record.getId());

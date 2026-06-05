@@ -13,6 +13,12 @@ public interface MealRecordRepository extends JpaRepository<MealRecord, UUID> {
     // 해당 날짜 + 순번 기록이 있는지 확인
     boolean existsByCatAndRecordDateAndSequence(Cat cat, LocalDate recordDate, int sequence);
 
+    List<MealRecord> findAllByCatAndRecordDateBetween(
+            Cat cat,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
     // 날짜별 식사 기록 조회 (순번 오름차순)
     List<MealRecord> findAllByCatAndRecordDateOrderBySequenceAsc(Cat cat, LocalDate recordDate);
 
