@@ -9,11 +9,14 @@ import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +38,7 @@ public class CatController {
 
     private final CatExportService catExportService;
     private final CatService catService;
+    private final CatExportService catExportService;
 
     // 고양이 기본 정보 조회
     // GET /api/v1/cats/me
