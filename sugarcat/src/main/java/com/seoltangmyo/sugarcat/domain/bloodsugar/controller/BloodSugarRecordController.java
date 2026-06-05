@@ -7,6 +7,7 @@ import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordUpdateRequ
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/blood-sugar-records")
 @RequiredArgsConstructor
@@ -30,7 +32,17 @@ public class BloodSugarRecordController {
             @RequestBody BloodSugarRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
+
+        // 요청으로 들어온 값 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 저장 요청 - userId={}, request={}",
+                userId, request);
+
         BloodSugarRecordCreateResponse response = bloodSugarRecordService.createBloodSugarRecord(userId, request);
+
+        // 응답으로 나가는 값 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 저장 응답 - userId={}, response={}",
+                userId, response);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -41,7 +53,20 @@ public class BloodSugarRecordController {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         UUID userId = userDetails.getUserId();
-        BloodSugarRecordListResponse response = bloodSugarRecordService.getBloodSugarRecordsByDate(userId, date);
+
+        // 요청으로 들어온 값 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 조회 요청 - userId={}, date={}",
+                userId, date);
+
+        // 서비스에서 날짜별 혈당 기록 조회
+        BloodSugarRecordListResponse response =
+                bloodSugarRecordService.getBloodSugarRecordsByDate(userId, date);
+
+        // 응답으로 나가는 값 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 조회 응답 - userId={}, date={}, response={}",
+                userId, date, response);
+
+        // 200 OK 응답 반환
         return ResponseEntity.ok(response);
     }
 
@@ -52,7 +77,19 @@ public class BloodSugarRecordController {
             @RequestBody BloodSugarRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
+
+        // 요청으로 들어온 값 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 수정 요청 - userId={}, request={}",
+                userId, request);
+
+        // 서비스에서 혈당 기록 수정
         bloodSugarRecordService.updateBloodSugarRecord(userId, request);
+
+        // 응답 body는 없지만, 수정 성공 여부를 로그로 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 수정 성공 - userId={}, request={}",
+                userId, request);
+
+        // 204 No Content 응답 반환
         return ResponseEntity.noContent().build();
     }
 
@@ -64,7 +101,19 @@ public class BloodSugarRecordController {
             @RequestParam("sequence") int sequence
     ) {
         UUID userId = userDetails.getUserId();
+
+        // 요청으로 들어온 값 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 삭제 요청 - userId={}, date={}, sequence={}",
+                userId, date, sequence);
+
+        // 서비스에서 혈당 기록 삭제
         bloodSugarRecordService.deleteBloodSugarRecord(userId, date, sequence);
+
+        // 응답 body는 없지만, 삭제 성공 여부를 로그로 확인
+        log.info("[BloodSugarRecordController] 혈당 기록 삭제 성공 - userId={}, date={}, sequence={}",
+                userId, date, sequence);
+
+        // 204 No Content 응답 반환
         return ResponseEntity.noContent().build();
     }
 

@@ -137,6 +137,7 @@ public class BasicCatExportService implements CatExportService {
             int insulinCount
     ) {
         Set<Integer> savedSequences = insulinRecords.stream()
+                .filter(InsulinRecord::isInjected)
                 .map(InsulinRecord::getSequence)
                 .collect(Collectors.toSet());
 
