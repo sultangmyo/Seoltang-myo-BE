@@ -56,7 +56,7 @@ public class MealRecordController {
     }
 
     // 식사 기록 저장
-    // POST /api/v1/meals/me?date={date}&sequence={sequence}
+    // POST /api/v1/meals/me
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createMealRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
