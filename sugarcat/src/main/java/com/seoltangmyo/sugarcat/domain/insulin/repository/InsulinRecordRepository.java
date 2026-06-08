@@ -13,6 +13,12 @@ public interface InsulinRecordRepository extends JpaRepository<InsulinRecord, UU
     // 해당 날짜 + 순번 기록이 있는지 확인
     boolean existsByCatAndRecordDateAndSequence(Cat cat, LocalDate recordDate, int sequence);
 
+    List<InsulinRecord> findAllByCatAndRecordDateBetween(
+            Cat cat,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
     // 날짜별 인슐린 기록 조회 (순번 오름차순)
     List<InsulinRecord> findAllByCatAndRecordDateOrderBySequenceAsc(Cat cat, LocalDate recordDate);
 

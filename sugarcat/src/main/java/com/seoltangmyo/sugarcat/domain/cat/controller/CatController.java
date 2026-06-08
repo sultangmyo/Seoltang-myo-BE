@@ -1,5 +1,7 @@
 package com.seoltangmyo.sugarcat.domain.cat.controller;
 
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
@@ -7,10 +9,14 @@ import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Slf4j
@@ -29,7 +36,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CatController {
 
+    private final CatExportService catExportService;
     private final CatService catService;
+    private final CatExportService catExportService;
 
     // 고양이 기본 정보 조회
     // GET /api/v1/cats/me
@@ -77,9 +86,9 @@ public class CatController {
     }
 
     // 초대코드 유효성 검증 + 공동 집사 합류
-    // GET /api/v1/cats/invite?code={inviteCode}
+    // PATCH /api/v1/cats/invite?code={inviteCode}
     // 유효하면 user.catId 저장 후 고양이 정보 반환, 유효하지 않으면 401
-    @GetMapping("/invite")
+    @PatchMapping("/invite")
     public ResponseEntity<InviteCodeValidateResponse> validateInviteCode(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("code") String inviteCode
@@ -103,5 +112,26 @@ public class CatController {
         UUID userId = userDetails.getUserId();
         MessageResponse response = catService.createCat(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @GetMapping("/me/export")
+    public ResponseEntity<CatExportResponse> exportRecords(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @RequestParam("startDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam("endDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        CatExportResponse response =
+                catExportService.exportRecords(userId, startDate, endDate);
+
+        return ResponseEntity.ok(response);
     }
 }
