@@ -36,6 +36,12 @@ public class InsulinRecordService {
         log.info("[인슐린 기록 저장] userId={}, date={}, sequence={}, isInjected={}",
                 userId, request.recordDate(), request.sequence(), request.isInjected());
 
+        if(!request.isInjected()) {
+            log.warn("[인슐린 기록 저장 실패] isInjected=false 요청 - userId={}, date={}, sequence={}",
+                    userId, request.recordDate(), request.sequence());
+            throw new IllegalArgumentException("인슐린 투여 기록은 투여한 경우에만 저장할 수 있습니다.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -61,7 +67,7 @@ public class InsulinRecordService {
                 user,
                 request.recordDate(),
                 request.sequence(),
-                request.isInjected()
+                true
         );
 
         insulinRecordRepository.save(record);
