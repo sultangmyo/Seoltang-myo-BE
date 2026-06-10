@@ -5,12 +5,14 @@ import com.seoltangmyo.sugarcat.domain.notification.service.PushTokenService;
 import com.seoltangmyo.sugarcat.domain.notification.type.PlatformType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicPushTokenService implements PushTokenService {
@@ -29,5 +31,7 @@ public class BasicPushTokenService implements PushTokenService {
                 .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.updateApnsDeviceToken(request.deviceToken());
+
+        log.info("[APNs 토큰 등록 완료] userId={}", userId);
     }
 }
