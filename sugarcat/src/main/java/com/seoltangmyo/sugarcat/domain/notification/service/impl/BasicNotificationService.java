@@ -10,14 +10,15 @@ import com.seoltangmyo.sugarcat.domain.notification.dto.ApnsSendResult;
 import com.seoltangmyo.sugarcat.domain.notification.service.ApnsSender;
 import com.seoltangmyo.sugarcat.domain.notification.service.NotificationPayloadFactory;
 import com.seoltangmyo.sugarcat.domain.notification.service.NotificationService;
+import com.seoltangmyo.sugarcat.domain.notification.service.PushTokenService;
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareSchedule;
 import com.seoltangmyo.sugarcat.domain.schedule.repository.CareScheduleRepository;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -40,6 +41,7 @@ public class BasicNotificationService implements NotificationService {
     private final BloodSugarRecordRepository bloodSugarRecordRepository;
     private final MealRecordRepository mealRecordRepository;
     private final CatRepository catRepository;
+    private final PushTokenService pushTokenService;
 
     @Override
     @Transactional
@@ -277,15 +279,16 @@ public class BasicNotificationService implements NotificationService {
             ApnsSendResult result = apnsSender.send(receiver.getApnsDeviceToken(), payload);
 
             if (result.success()) {
-                return;
+                log.info("APNs 전송 성공 - userId={}", receiver.getId());
+                continue;
             }
 
             if (result.invalidToken()) {
-                receiver.deactivateApnsToken();
+                pushTokenService.deactivateApnsToken(receiver.getId());
                 log.warn("APNs 토큰 비활성화 - userId={}, reason={}",
                         receiver.getId(),
                         result.reason());
-                return;
+                continue;
             }
 
             log.warn("APNs 전송 실패, 토큰은 유지 - userId={}, reason={}",
