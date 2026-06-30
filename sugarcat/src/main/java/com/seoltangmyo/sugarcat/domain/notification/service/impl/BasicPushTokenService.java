@@ -5,9 +5,10 @@ import com.seoltangmyo.sugarcat.domain.notification.service.PushTokenService;
 import com.seoltangmyo.sugarcat.domain.notification.type.PlatformType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -30,4 +31,15 @@ public class BasicPushTokenService implements PushTokenService {
 
         user.updateApnsDeviceToken(request.deviceToken());
     }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void deactivateApnsToken(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.deactivateApnsToken();
+    }
+
 }
