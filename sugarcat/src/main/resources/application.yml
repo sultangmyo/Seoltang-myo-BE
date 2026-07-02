@@ -15,6 +15,22 @@ spring:
         highlight_sql: true
         default_batch_fetch_size: 100
 
+  cache:
+    type: caffeine
+    cache-names:
+      - onboardingStatus
+      - userProfile
+      - userNotificationSettings
+      - catInfo
+      - mealSchedules
+      - bloodSugarSchedules
+      - insulinSchedules
+      - dailyMealRecords
+      - dailyBloodSugarRecords
+      - dailyInsulinRecords
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=30m
+
 # 서버 설정
 server:
   address: 0.0.0.0
