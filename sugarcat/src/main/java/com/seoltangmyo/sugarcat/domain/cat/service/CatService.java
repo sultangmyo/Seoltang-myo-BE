@@ -16,6 +16,7 @@ import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -121,8 +122,12 @@ public class CatService {
     }
 
     // 초대코드 유효성 검증 + 공동 집사 합류
-    // GET /api/v1/cats/invite?code={inviteCode}
+    // PATCH /api/v1/cats/invite?code={inviteCode}
     // 유효하지 않은 초대코드면 401 반환, 유효하면 user.catId 저장 후 고양이 정보 반환
+    @CacheEvict(
+            cacheNames = "userMe",
+            allEntries = true
+    )
     @Transactional
     public InviteCodeValidateResponse validateInviteCode(UUID userId, String inviteCode) {
         log.info("[초대코드 검증] userId={}, inviteCode={}", userId, inviteCode);

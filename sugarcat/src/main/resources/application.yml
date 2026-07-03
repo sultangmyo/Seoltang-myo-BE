@@ -19,7 +19,7 @@ spring:
     type: caffeine
     cache-names:
       - onboardingStatus
-      - userProfile
+      - userMe
       - userNotificationSettings
       - catInfo
       - mealSchedules
