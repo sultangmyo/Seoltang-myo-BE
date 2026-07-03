@@ -1,0 +1,43 @@
+package com.seoltangmyo.sugarcat.domain.cache;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class CatCacheEvictService {
+
+    @CacheEvict(
+            cacheNames = "catInfo",
+            key = "#catId"
+    )
+    public void evictCatInfo(UUID catId) {}
+
+    @CacheEvict(
+            cacheNames = "mealSchedules",
+            key = "#catId"
+    )
+    public void evictMealSchedules(UUID catId) {}
+
+    @CacheEvict(
+            cacheNames = "dailyMealRecords",
+            key = "{#catId, #date}"
+    )
+    public void evictDailyMealRecords(UUID catId, LocalDate date) {}
+
+    @CacheEvict(
+            cacheNames = "dailyBloodSugarRecords",
+            key = "{#catId, #date}"
+    )
+    public void evictDailyBloodSugarRecords(UUID catId, LocalDate date) {}
+
+    @CacheEvict(
+            cacheNames = "dailyInsulinRecords",
+            key = "{#catId, #date}"
+    )
+    public void evictDailyInsulinRecords(UUID catId, LocalDate date) {}
+}

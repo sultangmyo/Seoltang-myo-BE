@@ -1,5 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.cat.service;
 
+import com.seoltangmyo.sugarcat.domain.cache.CatCacheEvictService;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
@@ -35,6 +36,8 @@ public class CatService {
     private final CatRepository catRepository;
     private final CareScheduleRepository careScheduleRepository;
     private final UserRepository userRepository;
+    private final CatInfoQueryService catInfoQueryService;
+    private final CatCacheEvictService catCacheEvictService;
 
     // 스케줄 시간 파싱 포맷 (프론트에서 "HH:mm" 형식으로 전달)
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -161,7 +164,7 @@ public class CatService {
 
         log.info("[고양이 정보 조회 완료] catId={}", cat.getId());
 
-        return new CatInfoResponse(cat.getName(), cat.getBirthDate(), cat.getDiagnosedDate());
+        return catInfoQueryService.getCatInfo(userId);
     }
 
     // 고양이 기본 정보 수정
@@ -177,6 +180,8 @@ public class CatService {
 
         // 더티체킹으로 자동 반영
         cat.updateInfo(request.name(), request.birthDate(), request.diagnosedDate());
+
+        catCacheEvictService.evictCatInfo(cat.getId());
 
         log.info("[고양이 정보 수정 완료] catId={}", cat.getId());
 
