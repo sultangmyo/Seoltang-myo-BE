@@ -36,4 +36,13 @@ public class CatCacheEvictService {
             LocalDate date
     ) {}
 
+    @CacheEvict(
+            cacheNames = "dailyBloodSugarRecords",
+            key = "{#catId, #date}"
+    )
+    public void evictDailyBloodSugarRecords(
+            UUID catId,
+            LocalDate date
+    ) {}
+
 }
