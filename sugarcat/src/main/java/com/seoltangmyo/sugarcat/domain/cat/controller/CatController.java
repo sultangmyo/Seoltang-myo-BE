@@ -38,7 +38,6 @@ public class CatController {
 
     private final CatExportService catExportService;
     private final CatService catService;
-    private final CatExportService catExportService;
 
     // 고양이 기본 정보 조회
     // GET /api/v1/cats/me

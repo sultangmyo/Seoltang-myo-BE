@@ -7,14 +7,16 @@ import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordResponse;
 import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.meal.entity.MealRecord;
 import com.seoltangmyo.sugarcat.domain.meal.entity.MealStatus;
+import com.seoltangmyo.sugarcat.domain.meal.event.MealRecordCreatedEvent;
 import com.seoltangmyo.sugarcat.domain.meal.repository.MealRecordRepository;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,9 +29,10 @@ public class MealRecordService {
 
     private final MealRecordRepository mealRecordRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 식사 기록 저장
-    // POST /api/v1/meals/me?date={date}&sequence={sequence}
+    // POST /api/v1/meals/me
     // 같은 날짜+순번 기록이 이미 있으면 예외 처리
     @Transactional
     public MessageResponse createMealRecord(UUID userId, MealRecordCreateRequest request) {
@@ -60,12 +63,15 @@ public class MealRecordService {
 
         log.info("[식사 기록 저장 완료] recordId={}", mealRecord.getId());
 
+        eventPublisher.publishEvent(new MealRecordCreatedEvent(mealRecord.getId()));
+        log.info("[식사 기록 저장 이벤트 발행] recordId={}", mealRecord.getId());
+
         return new MessageResponse("식사 기록이 저장되었습니다.");
     }
 
     // 날짜별 식사 기록 조회
     // GET /api/v1/meals/me?date={date}
-    @Transactional
+    @Transactional(readOnly = true)
     public MealRecordListResponse getMealRecords(UUID userId, LocalDate date) {
         log.info("[식사 기록 조회] userId={}, date={}", userId, date);
 
