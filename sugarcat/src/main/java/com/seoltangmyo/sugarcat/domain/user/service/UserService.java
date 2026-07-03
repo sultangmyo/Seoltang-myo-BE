@@ -9,7 +9,7 @@ import com.seoltangmyo.sugarcat.domain.user.dto.UserMeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -78,6 +78,10 @@ public class UserService {
     // 알림 전체 수정
     // 온보딩에서 알림 허용 시 → notificationEnabled = true → 4가지 알림 전부 ON
     // 온보딩에서 알림 거부 시 → notificationEnabled = false → 4가지 알림 전부 OFF
+    @CacheEvict(
+            cacheNames = "userNotificationSettings",
+            key = "#userId"
+    )
     @Transactional
     public MessageResponse updateNotification(UUID userId, NotificationUpdateRequest request) {
         log.info("[알림 전체 수정] userId={}, enabled={}", userId, request.notificationEnabled());
@@ -94,7 +98,11 @@ public class UserService {
 
     // 알림 정보 조회
     // GET /api/v1/users/me/notification
-    @Transactional
+    @Cacheable(
+            cacheNames = "userNotificationSettings",
+            key = "#userId"
+    )
+    @Transactional(readOnly = true)
     public NotificationInfoResponse getNotificationInfo(UUID userId) {
         log.info("[알림 정보 조회] userId={}", userId);
 
@@ -111,7 +119,11 @@ public class UserService {
 
     // 알림 개별 수정
     // PATCH /api/v1/users/me/notification?type={type}
-    // type: insulin / blood / meal / weekly
+    // type: insulin / blood / meal / weekly용
+    @CacheEvict(
+            cacheNames = "userNotificationSettings",
+            key = "#userId"
+    )
     @Transactional
     public MessageResponse updateSingleNotification(UUID userId, String type, NotificationSingleUpdateRequest request) {
         log.info("[알림 개별 수정] userId={}, type={}, enabled={}", userId, type, request.isEnabled());
@@ -145,6 +157,10 @@ public class UserService {
             ),
             @CacheEvict(
                     cacheNames = "onboardingStatus",
+                    key = "#userId"
+            ),
+            @CacheEvict(
+                    cacheNames = "userNotificationSettings",
                     key = "#userId"
             )
     })
