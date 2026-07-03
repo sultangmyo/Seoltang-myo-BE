@@ -1,6 +1,5 @@
 package com.seoltangmyo.sugarcat.domain.insulin.service;
 
-import com.seoltangmyo.sugarcat.domain.cache.CatCacheEvictService;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordListResponse;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -30,7 +28,6 @@ public class InsulinRecordService {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final InsulinRecordQueryService insulinRecordQueryService;
-    private final CatCacheEvictService catCacheEvictService;
 
     // 인슐린 투여 기록 저장
     // POST /api/v1/insulin-records/me
