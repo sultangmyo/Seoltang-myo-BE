@@ -23,9 +23,9 @@ spring:
       - userNotificationSettings
       - catInfo
       - careSchedules
-      - dailyMealRecords
-      - dailyBloodSugarRecords
       - dailyInsulinRecords
+      - dailyBloodSugarRecords
+      - dailyMealRecords
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=30m
 

@@ -28,20 +28,12 @@ public class CatCacheEvictService {
     ) {}
 
     @CacheEvict(
-            cacheNames = "dailyMealRecords",
-            key = "{#catId, #date}"
-    )
-    public void evictDailyMealRecords(UUID catId, LocalDate date) {}
-
-    @CacheEvict(
-            cacheNames = "dailyBloodSugarRecords",
-            key = "{#catId, #date}"
-    )
-    public void evictDailyBloodSugarRecords(UUID catId, LocalDate date) {}
-
-    @CacheEvict(
             cacheNames = "dailyInsulinRecords",
             key = "{#catId, #date}"
     )
-    public void evictDailyInsulinRecords(UUID catId, LocalDate date) {}
+    public void evictDailyInsulinRecords(
+            UUID catId,
+            LocalDate date
+    ) {}
+
 }
