@@ -22,7 +22,7 @@ public class CatInfoQueryService {
             cacheNames = "catInfo",
             key = "#catId"
     )
-    @Transactional(readOnly = true) // 조회 전용 트랜잭션
+    @Transactional(readOnly = true)
     public CatInfoResponse getCatInfo(UUID catId) {
         log.info("[고양이 정보 조회 - 캐시 미스] catId={}", catId);
 
