@@ -22,9 +22,7 @@ spring:
       - userMe
       - userNotificationSettings
       - catInfo
-      - mealSchedules
-      - bloodSugarSchedules
-      - insulinSchedules
+      - careSchedules
       - dailyMealRecords
       - dailyBloodSugarRecords
       - dailyInsulinRecords

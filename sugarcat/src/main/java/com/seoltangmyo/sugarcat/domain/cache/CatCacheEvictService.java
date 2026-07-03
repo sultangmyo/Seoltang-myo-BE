@@ -1,5 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.cache;
 
+import com.seoltangmyo.sugarcat.domain.schedule.entity.CareScheduleType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,13 @@ public class CatCacheEvictService {
     public void evictCatInfo(UUID catId) {}
 
     @CacheEvict(
-            cacheNames = "mealSchedules",
-            key = "#catId"
+            cacheNames = "careSchedules",
+            key = "{#catId, #type}"
     )
-    public void evictMealSchedules(UUID catId) {}
+    public void evictCareSchedules(
+            UUID catId,
+            CareScheduleType type
+    ) {}
 
     @CacheEvict(
             cacheNames = "dailyMealRecords",
