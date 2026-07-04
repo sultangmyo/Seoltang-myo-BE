@@ -8,6 +8,7 @@ import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -34,4 +35,15 @@ public class BasicPushTokenService implements PushTokenService {
 
         log.info("[APNs 토큰 등록 완료] userId={}", userId);
     }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void deactivateApnsToken(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.deactivateApnsToken();
+    }
+
 }

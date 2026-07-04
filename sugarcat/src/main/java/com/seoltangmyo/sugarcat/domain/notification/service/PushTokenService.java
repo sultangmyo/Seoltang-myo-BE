@@ -6,4 +6,6 @@ import java.util.UUID;
 
 public interface PushTokenService {
     void registerDeviceToken(UUID userId, DeviceTokenRequest request);
+
+    void deactivateApnsToken(UUID userId);
 }
