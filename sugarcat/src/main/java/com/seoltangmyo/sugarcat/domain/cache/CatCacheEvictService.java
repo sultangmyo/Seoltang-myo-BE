@@ -1,7 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.cache;
 
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareScheduleType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class CatCacheEvictService {
 
     // 고양이 정보 수정
