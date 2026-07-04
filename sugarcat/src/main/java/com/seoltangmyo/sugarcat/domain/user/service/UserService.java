@@ -1,6 +1,7 @@
 package com.seoltangmyo.sugarcat.domain.user.service;
 
 import com.seoltangmyo.sugarcat.domain.cache.CatCacheEvictService;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.dto.NicknameUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.NotificationInfoResponse;
@@ -28,6 +29,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CatCacheEvictService catCacheEvictService;
+    private final CatService catService;
 
     // 내 정보 조회 (닉네임 + 같은 고양이를 가진 다른 집사 목록)
     // GET /api/v1/users/me
@@ -175,7 +177,23 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+        Cat cat = user.getCat();
+
+        boolean isLastUserOfCat = false;
+
+        if (cat != null) {
+            long catUserCount = userRepository.countByCat(cat);
+
+            isLastUserOfCat = catUserCount == 1;
+
+            log.info("[고양이 연결 사용자 수 확인] catId={}, userCount={}", cat.getId(), catUserCount);
+        }
+
         userRepository.delete(user);
+
+        if (isLastUserOfCat) {
+            catService.deleteCat(cat);
+        }
 
         catCacheEvictService.evictAllRecordCaches();
 
