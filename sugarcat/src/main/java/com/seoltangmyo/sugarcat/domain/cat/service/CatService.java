@@ -164,7 +164,7 @@ public class CatService {
 
         log.info("[고양이 정보 조회 완료] catId={}", cat.getId());
 
-        return catInfoQueryService.getCatInfo(userId);
+        return catInfoQueryService.getCatInfo(cat.getId());
     }
 
     // 고양이 기본 정보 수정
