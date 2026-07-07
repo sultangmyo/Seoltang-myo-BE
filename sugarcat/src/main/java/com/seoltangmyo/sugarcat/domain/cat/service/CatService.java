@@ -193,6 +193,11 @@ public class CatService {
     // 타입별로 (MEAL / BLOODSUGAR / INSULIN) 각각 호출
     private void saveSchedules(Cat cat, CareScheduleType type, List<CatCreateRequest.ScheduleItem> schedules) {
         for (CatCreateRequest.ScheduleItem item : schedules) {
+
+            if (item.time() == null || item.time().isBlank()) {
+                continue;
+            }
+
             // "HH:mm" 문자열 → LocalTime 변환
             LocalTime time = LocalTime.parse(item.time(), TIME_FORMATTER);
             CareSchedule schedule = CareSchedule.create(cat, type, item.sequence(), time);

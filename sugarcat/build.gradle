@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.eatthepath:pushy:0.15.4'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.12.Final:osx-aarch_64'
 }
 
 tasks.named('test') {

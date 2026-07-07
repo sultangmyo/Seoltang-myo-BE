@@ -32,7 +32,7 @@ public record CatCreateRequest(
     // 개별 스케줄 항목
     public record ScheduleItem(
             int sequence,  // 회차 (1, 2, 3 …) - 프론트에서 전달한 값 그대로 저장
-            String time    // 시간 (HH:mm 형식)
+            String time    // 시간 (HH:mm 형식, null 허용 -> 저장하지 않음)
     ) {
     }
 }
