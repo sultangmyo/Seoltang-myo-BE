@@ -1,5 +1,6 @@
 package com.seoltangmyo.sugarcat.domain.schedule.service;
 
+import com.seoltangmyo.sugarcat.domain.cache.CatCacheEvictService;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.schedule.dto.CareScheduleInfoResponse;
 import com.seoltangmyo.sugarcat.domain.schedule.dto.CareScheduleUpdateRequest;
@@ -24,6 +25,8 @@ public class CareScheduleService {
 
     private final CareScheduleRepository careScheduleRepository;
     private final UserRepository userRepository;
+    private final CareScheduleQueryService careScheduleQueryService;
+    private final CatCacheEvictService catCacheEvictService;
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -34,27 +37,15 @@ public class CareScheduleService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Cat cat = user.getCat();
+
         if (cat == null) {
             throw new IllegalArgumentException("등록된 고양이가 없습니다.");
         }
 
-        List<CareSchedule> schedules =
-                careScheduleRepository.findAllByCatAndScheduleTypeOrderBySequenceAsc(cat, type);
-
-        int count = switch (type) {
-            case MEAL -> cat.getMealCount();
-            case BLOODSUGAR -> cat.getBloodSugarCount();
-            case INSULIN -> cat.getInsulinCount();
-        };
-
-        List<CareScheduleInfoResponse.ScheduleItem> items = schedules.stream()
-                .map(s -> new CareScheduleInfoResponse.ScheduleItem(
-                        s.getSequence(),
-                        s.getScheduledTime().format(TIME_FORMATTER)
-                ))
-                .toList();
-
-        return new CareScheduleInfoResponse(count, items);
+        return careScheduleQueryService.getSchedules(
+                cat.getId(),
+                type
+        );
     }
 
     // 케어 스케줄 수정 (식사 / 혈당 / 인슐린 공용)
@@ -96,6 +87,11 @@ public class CareScheduleService {
             case BLOODSUGAR -> "혈당 체크 설정이 수정되었습니다.";
             case INSULIN -> "인슐린 관리 설정이 수정되었습니다.";
         };
+
+        catCacheEvictService.evictCareSchedules(
+                cat.getId(),
+                type
+        );
 
         return new MessageResponse(message);
     }

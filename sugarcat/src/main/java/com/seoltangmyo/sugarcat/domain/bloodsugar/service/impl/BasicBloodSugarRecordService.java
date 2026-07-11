@@ -3,8 +3,10 @@ package com.seoltangmyo.sugarcat.domain.bloodsugar.service.impl;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.*;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.BloodSugarRecord;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.entity.SugarStatus;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.event.BloodSugarRecordCacheEvictEvent;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.event.BloodSugarRecordCreatedEvent;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.repository.BloodSugarRecordRepository;
+import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordQueryService;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +28,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
     private final BloodSugarRecordRepository bloodSugarRecordRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final BloodSugarRecordQueryService bloodSugarRecordQueryService;
 
     @Override
     @Transactional
@@ -64,6 +66,13 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
 
         bloodSugarRecordRepository.save(bloodSugarRecord);
 
+        eventPublisher.publishEvent(
+                new BloodSugarRecordCacheEvictEvent(
+                        cat.getId(),
+                        request.recordedDate()
+                )
+        );
+
         log.info("[혈당 기록 저장 완료] recordId={}, sugarStatus={}", bloodSugarRecord.getId(), sugarStatus);
 
         eventPublisher.publishEvent(new BloodSugarRecordCreatedEvent(bloodSugarRecord.getId()));
@@ -88,22 +97,10 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
 
         Cat cat = user.getCat();
 
-        List<BloodSugarRecord> records =
-                bloodSugarRecordRepository.findAllByCatAndRecordDateOrderBySequenceAsc(cat, date);
-
-        log.info("[혈당 기록 조회 완료] catId={}, date={}, count={}", cat.getId(), date, records.size());
-
-        List<BloodSugarRecordResponse> recordResponses = records.stream()
-                .map(record -> new BloodSugarRecordResponse(
-                        record.getRecordedBy() != null ? record.getRecordedBy().getNickname() : "탈퇴한 사용자",
-                        record.getRecordTime(),
-                        record.getSequence(),
-                        record.getSugarValue(),
-                        record.getSugarStatus()
-                ))
-                .toList();
-
-        return new BloodSugarRecordListResponse(recordResponses);
+        return bloodSugarRecordQueryService.getBloodSugarRecordsByDate(
+                cat.getId(),
+                date
+        );
     }
 
     @Override
@@ -139,6 +136,13 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 sugarStatus
         );
 
+        eventPublisher.publishEvent(
+                new BloodSugarRecordCacheEvictEvent(
+                        cat.getId(),
+                        request.recordedDate()
+                )
+        );
+
         log.info("[혈당 기록 수정 완료] recordId={}", bloodSugarRecord.getId());
     }
 
@@ -167,6 +171,13 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 });
 
         bloodSugarRecordRepository.delete(bloodSugarRecord);
+
+        eventPublisher.publishEvent(
+                new BloodSugarRecordCacheEvictEvent(
+                        cat.getId(),
+                        date
+                )
+        );
 
         log.info("[혈당 기록 삭제 완료] recordId={}", bloodSugarRecord.getId());
     }

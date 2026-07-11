@@ -4,6 +4,7 @@ import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordCreateRequest;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordListResponse;
 import com.seoltangmyo.sugarcat.domain.insulin.entity.InsulinRecord;
+import com.seoltangmyo.sugarcat.domain.insulin.event.InsulinRecordCacheEvictEvent;
 import com.seoltangmyo.sugarcat.domain.insulin.event.InsulinRecordCreatedEvent;
 import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepository;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +27,7 @@ public class InsulinRecordService {
     private final InsulinRecordRepository insulinRecordRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final InsulinRecordQueryService insulinRecordQueryService;
 
     // 인슐린 투여 기록 저장
     // POST /api/v1/insulin-records/me
@@ -72,6 +73,13 @@ public class InsulinRecordService {
 
         insulinRecordRepository.save(record);
 
+        eventPublisher.publishEvent(
+                new InsulinRecordCacheEvictEvent(
+                        cat.getId(),
+                        request.recordDate()
+                )
+        );
+
         log.info("[인슐린 기록 저장 완료] recordId={}", record.getId());
 
         eventPublisher.publishEvent(new InsulinRecordCreatedEvent(record.getId()));
@@ -92,19 +100,9 @@ public class InsulinRecordService {
 
         Cat cat = user.getCat();
 
-        List<InsulinRecord> records =
-                insulinRecordRepository.findAllByCatAndRecordDateOrderBySequenceAsc(cat, date);
-
-        log.info("[인슐린 기록 조회 완료] catId={}, date={}, count={}", cat.getId(), date, records.size());
-
-        List<InsulinRecordListResponse.InsulinRecordItem> items = records.stream()
-                .map(r -> new InsulinRecordListResponse.InsulinRecordItem(
-                        r.getSequence(),
-                        r.isInjected(),
-                        r.getRecordedBy() != null ? r.getRecordedBy().getNickname() : "탈퇴한 사용자"
-                ))
-                .toList();
-
-        return new InsulinRecordListResponse(items);
+        return insulinRecordQueryService.getInsulinRecords(
+                cat.getId(),
+                date
+        );
     }
 }

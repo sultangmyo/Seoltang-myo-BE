@@ -9,6 +9,8 @@ import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
 import com.seoltangmyo.sugarcat.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,6 +114,11 @@ public class AuthService {
         user.deactivateApnsToken(); // device token 비활성화
     }
 
+    @Cacheable(
+            cacheNames = "onboardingStatus",
+            key = "#userId"
+    )
+    @Transactional(readOnly = true)
     public OnboardingStatusResponse getOnboardingStatus(UUID userId) {
         log.info("##log## 서비스 - 온보딩 진입 ");
         User user = userRepository.findById(userId)
@@ -120,6 +127,10 @@ public class AuthService {
         return new OnboardingStatusResponse(user.isOnboardingCompleted());
     }
 
+    @CacheEvict(
+            cacheNames = "onboardingStatus",
+            key = "#userId"
+    )
     @Transactional
     public OnboardingCompleteResponse completeOnboarding(UUID userId) {
         User user = userRepository.findById(userId)
