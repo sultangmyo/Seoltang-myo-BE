@@ -78,9 +78,16 @@ public class CareScheduleService {
 
         // 기존 스케줄 전체 삭제 후 새로 저장
         careScheduleRepository.deleteAllByCatAndScheduleType(cat, type);
+        careScheduleRepository.flush();
 
         for (CareScheduleUpdateRequest.ScheduleItem item : request.schedules()) {
+
+            if (item.time() == null || item.time().isBlank()) {
+                continue;
+            }
+
             LocalTime time = LocalTime.parse(item.time(), TIME_FORMATTER);
+
             careScheduleRepository.save(CareSchedule.create(cat, type, item.sequence(), time));
         }
 

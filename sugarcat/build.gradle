@@ -37,6 +37,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
     implementation 'com.eatthepath:pushy:0.15.4'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.12.Final:osx-aarch_64'
 }
 
 tasks.named('test') {
