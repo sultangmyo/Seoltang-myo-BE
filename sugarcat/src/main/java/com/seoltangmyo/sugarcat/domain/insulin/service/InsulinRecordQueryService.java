@@ -5,6 +5,8 @@ import com.seoltangmyo.sugarcat.domain.cat.repository.CatRepository;
 import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordListResponse;
 import com.seoltangmyo.sugarcat.domain.insulin.entity.InsulinRecord;
 import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,7 +37,7 @@ public class InsulinRecordQueryService {
         log.info("[인슐린 기록 조회 - 캐시 미스] catId={}, date={}", catId, date);
 
         Cat cat = catRepository.findById(catId)
-                .orElseThrow(() -> new IllegalArgumentException("고양이를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CAT_NOT_FOUND));
 
         List<InsulinRecord> records =
                 insulinRecordRepository.findAllByCatAndRecordDateOrderBySequenceAsc(cat, date);

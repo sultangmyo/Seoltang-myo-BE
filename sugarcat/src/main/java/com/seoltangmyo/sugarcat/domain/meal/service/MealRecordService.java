@@ -12,6 +12,8 @@ import com.seoltangmyo.sugarcat.domain.meal.repository.MealRecordRepository;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -43,12 +45,12 @@ public class MealRecordService {
         log.info("[식사 기록 저장] userId={}, date={}, sequence={}, mealStatus={}", userId, request, sequence, request.mealStatus());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
         if (cat == null) {
             log.warn("[식사 기록 저장 실패] 고양이 없음 - userId={}", userId);
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
         }
 
         boolean exists = mealRecordRepository.existsByCatAndRecordDateAndSequence(cat, date, sequence);
@@ -86,13 +88,13 @@ public class MealRecordService {
         log.info("[식사 기록 조회] userId={}, date={}", userId, date);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
 
         if (cat == null) {
             log.warn("[식사 기록 조회 실패] 고양이 없음 - userId={}", userId);
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
         }
 
         return mealRecordQueryService.getMealRecords(
@@ -109,16 +111,19 @@ public class MealRecordService {
         log.info("[식사 기록 수정] userId={}, date={}, sequence={}", userId, request.date(), request.sequence());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         MealRecord mealRecord = mealRecordRepository
                 .findByCatAndRecordDateAndSequence(cat, request.date(), request.sequence())
                 .orElseThrow(() -> {
                     log.warn("[식사 기록 수정 실패] 기록 없음 - catId={}, date={}, sequence={}",
                             cat.getId(), request.date(), request.sequence());
-                    return new IllegalArgumentException("식사 기록을 찾을 수 없습니다.");
+                    return new BusinessException(ErrorCode.RECORD_NOT_FOUND);
                 });
 
         MealStatus mealStatus = MealStatus.valueOf(request.mealStatus());

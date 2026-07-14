@@ -124,7 +124,7 @@ public class AuthService {
     @Transactional
     public void logout(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.clearRefreshToken(); // DB에 저장된 refresh token 제거
         user.deactivateApnsToken(); // device token 비활성화
@@ -138,7 +138,7 @@ public class AuthService {
     public OnboardingStatusResponse getOnboardingStatus(UUID userId) {
         log.info("##log## 서비스 - 온보딩 진입 ");
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         log.info("##log## 서비스 - 온보딩 종료 유저 아이디: {}", userId);
         return new OnboardingStatusResponse(user.isOnboardingCompleted());
     }
@@ -150,7 +150,7 @@ public class AuthService {
     @Transactional
     public OnboardingCompleteResponse completeOnboarding(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.completeOnboarding();
 

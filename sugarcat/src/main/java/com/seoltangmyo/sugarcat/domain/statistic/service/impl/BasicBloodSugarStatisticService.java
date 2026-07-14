@@ -8,6 +8,8 @@ import com.seoltangmyo.sugarcat.domain.statistic.dto.BloodSugarWeeklyStatisticsR
 import com.seoltangmyo.sugarcat.domain.statistic.service.BloodSugarStatisticService;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +40,12 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
         validateWeeklyPeriod(period);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         LocalDate endDate = startDate.plusDays(6);
 
@@ -114,9 +119,12 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
         validateMonthlyPeriod(period);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         LocalDate monthStartDate = date.withDayOfMonth(1);
         LocalDate monthEndDate = date.withDayOfMonth(date.lengthOfMonth());

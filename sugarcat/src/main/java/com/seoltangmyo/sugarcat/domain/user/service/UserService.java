@@ -11,6 +11,8 @@ import com.seoltangmyo.sugarcat.domain.user.dto.UserMeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +44,7 @@ public class UserService {
         log.info("[내 정보 조회] userId={}", userId);
 
         User me = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = me.getCat();
 
@@ -70,7 +72,7 @@ public class UserService {
         log.info("[닉네임 수정] userId={}, nickname={}", userId, request.nickname());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updateNickname(request.nickname());
 
@@ -93,7 +95,7 @@ public class UserService {
         log.info("[알림 전체 수정] userId={}, enabled={}", userId, request.notificationEnabled());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updateNotification(request.notificationEnabled());
 
@@ -113,7 +115,7 @@ public class UserService {
         log.info("[알림 정보 조회] userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return new NotificationInfoResponse(
                 user.isInsulinNotiEnabled(),
@@ -135,7 +137,7 @@ public class UserService {
         log.info("[알림 개별 수정] userId={}, type={}, enabled={}", userId, type, request.isEnabled());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updateSingleNotification(type, request.isEnabled());
 
@@ -175,7 +177,7 @@ public class UserService {
         log.info("[사용자 삭제] userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
 

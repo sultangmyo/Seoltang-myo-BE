@@ -6,6 +6,8 @@ import com.seoltangmyo.sugarcat.domain.schedule.dto.CareScheduleInfoResponse;
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareSchedule;
 import com.seoltangmyo.sugarcat.domain.schedule.entity.CareScheduleType;
 import com.seoltangmyo.sugarcat.domain.schedule.repository.CareScheduleRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +41,7 @@ public class CareScheduleQueryService {
         log.info("[케어 스케줄 조회 - 캐시 미스] catId={}, type={}", catId, type);
 
         Cat cat = catRepository.findById(catId)
-                .orElseThrow(() -> new IllegalArgumentException("고양이를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CAT_NOT_FOUND));
 
         List<CareSchedule> schedules =
                 careScheduleRepository.findAllByCatAndScheduleTypeOrderBySequenceAsc(

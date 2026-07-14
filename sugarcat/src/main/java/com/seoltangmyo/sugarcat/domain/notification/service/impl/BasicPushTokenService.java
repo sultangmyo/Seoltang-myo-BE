@@ -5,6 +5,8 @@ import com.seoltangmyo.sugarcat.domain.notification.service.PushTokenService;
 import com.seoltangmyo.sugarcat.domain.notification.type.PlatformType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,7 @@ public class BasicPushTokenService implements PushTokenService {
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updateApnsDeviceToken(request.deviceToken());
 
@@ -41,7 +43,7 @@ public class BasicPushTokenService implements PushTokenService {
     public void deactivateApnsToken(UUID userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.deactivateApnsToken();
     }

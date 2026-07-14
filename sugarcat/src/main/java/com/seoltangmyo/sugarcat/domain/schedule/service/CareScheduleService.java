@@ -10,6 +10,8 @@ import com.seoltangmyo.sugarcat.domain.schedule.repository.CareScheduleRepositor
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,12 +36,12 @@ public class CareScheduleService {
     @Transactional
     public CareScheduleInfoResponse getSchedules(UUID userId, CareScheduleType type) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
 
         if (cat == null) {
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
         }
 
         return careScheduleQueryService.getSchedules(
@@ -53,11 +55,11 @@ public class CareScheduleService {
     @Transactional
     public MessageResponse updateSchedules(UUID userId, CareScheduleType type, CareScheduleUpdateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
         if (cat == null) {
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
         }
 
         // cat count 업데이트
