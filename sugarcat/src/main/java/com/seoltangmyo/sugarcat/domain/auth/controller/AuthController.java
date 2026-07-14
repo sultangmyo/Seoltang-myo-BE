@@ -8,6 +8,7 @@ import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
 import com.seoltangmyo.sugarcat.domain.auth.service.AuthService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/apple")
     public ResponseEntity<SocialLoginResponse> appleLogin(
-            @RequestBody AppleLoginRequest request
+            @Valid @RequestBody AppleLoginRequest request
     ) {
         log.info("body = {}", request);
         log.info("##log## 컨트롤러 - 애플로그인 진입 ");
@@ -37,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/kakao")
     public ResponseEntity<SocialLoginResponse> kakaoLogin(
-            @RequestBody KakaoLoginRequest request
+            @Valid @RequestBody KakaoLoginRequest request
     ) {
         log.info("body = {}", request);
         log.info("##log## 컨트롤러 - 카카오로그인 진입 ");

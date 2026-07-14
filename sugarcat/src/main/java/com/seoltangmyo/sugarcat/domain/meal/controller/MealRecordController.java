@@ -6,6 +6,7 @@ import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.meal.service.MealRecordService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -60,7 +61,7 @@ public class MealRecordController {
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createMealRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody MealRecordCreateRequest request
+            @Valid @RequestBody MealRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 
@@ -84,7 +85,7 @@ public class MealRecordController {
     @PatchMapping("/me")
     public ResponseEntity<MessageResponse> updateMealRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody MealRecordUpdateRequest request
+            @Valid @RequestBody MealRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 
