@@ -1,6 +1,8 @@
 package com.seoltangmyo.sugarcat.domain.auth.client;
 
 import com.seoltangmyo.sugarcat.domain.auth.dto.KakaoUserInfoResponse;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 
 @Slf4j
@@ -27,9 +30,13 @@ public class KakaoApiClient {
                     .retrieve()
                     .body(KakaoUserInfoResponse.class);
         } catch (HttpClientErrorException e) {
-            throw new IllegalArgumentException("유효하지 않은 카카오 액세스 토큰입니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "유효하지 않은 카카오 액세스 토큰입니다.");
         } catch (HttpServerErrorException e) {
-            throw new IllegalStateException("카카오 서버 오류입니다. 잠시 후 다시 시도해주세요.");
+            log.error("카카오 서버 오류", e);
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
+        } catch (RestClientException e) {
+            log.error("카카오 API 호출 실패", e);
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
         }
     }
 }

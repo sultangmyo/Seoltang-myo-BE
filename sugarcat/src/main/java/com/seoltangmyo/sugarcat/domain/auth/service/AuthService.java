@@ -181,7 +181,7 @@ public class AuthService {
         Long id = response.id();
 
         if (id == null) {
-            throw new IllegalArgumentException("카카오 사용자 정보를 가져오지 못했습니다.");
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
         }
 
         return id.toString();

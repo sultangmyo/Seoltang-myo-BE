@@ -3,6 +3,8 @@ package com.seoltangmyo.sugarcat.domain.auth.service;
 import com.seoltangmyo.sugarcat.domain.auth.client.AppleApiClient;
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKey;
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKeyResponse;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -124,7 +126,7 @@ public class AppleTokenVerifier {
         ApplePublicKeyResponse response = appleApiClient.getPublicKeys();
 
         if (response == null || response.keys() == null) {
-            throw new IllegalArgumentException("Apple 공개키를 가져오지 못했습니다.");
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
         }
 
         return response.keys().stream()
@@ -148,7 +150,7 @@ public class AppleTokenVerifier {
 
             return keyFactory.generatePublic(publicKeySpec);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Apple 공개키 생성에 실패했습니다.", e);
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
         }
     }
 }
