@@ -79,6 +79,7 @@ public class CatService {
 
     private static final String INVITE_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int INVITE_CODE_LENGTH = 8;
+    private static final String INVITE_CODE_PATTERN = "^[A-Z0-9]{8}$";
 
     // 초대코드 조회
     // GET /api/v1/cats/me/invite-code
@@ -140,6 +141,10 @@ public class CatService {
     @Transactional
     public InviteCodeValidateResponse validateInviteCode(UUID userId, String inviteCode) {
         log.info("[초대코드 검증] userId={}, inviteCode={}", userId, inviteCode);
+
+        if (inviteCode == null || inviteCode.isBlank() || !inviteCode.matches(INVITE_CODE_PATTERN)) {
+            throw new BusinessException(ErrorCode.INVALID_INVITE_CODE_FORMAT);
+        }
 
         Cat cat = catRepository.findByInviteCode(inviteCode)
                 .orElseThrow(() -> {
