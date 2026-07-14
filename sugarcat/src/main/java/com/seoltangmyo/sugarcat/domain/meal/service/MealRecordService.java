@@ -56,7 +56,7 @@ public class MealRecordService {
         boolean exists = mealRecordRepository.existsByCatAndRecordDateAndSequence(cat, date, sequence);
         if (exists) {
             log.warn("[식사 기록 저장 실패] 중복 기록 - catId={}, date={}, sequence={}", cat.getId(), date, sequence);
-            throw new IllegalArgumentException("이미 해당 순번의 식사 기록이 존재합니다.");
+            throw new BusinessException(ErrorCode.DUPLICATE_RECORD, "이미 해당 순번의 식사 기록이 존재합니다.");
         }
 
         MealStatus mealStatus = MealStatus.valueOf(request.mealStatus());

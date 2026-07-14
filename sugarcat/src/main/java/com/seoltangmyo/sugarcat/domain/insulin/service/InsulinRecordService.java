@@ -62,7 +62,7 @@ public class InsulinRecordService {
         if (exists) {
             log.warn("[인슐린 기록 저장 실패] 중복 기록 - catId={}, date={}, sequence={}",
                     cat.getId(), request.recordDate(), request.sequence());
-            throw new IllegalArgumentException("이미 해당 순번의 인슐린 기록이 존재합니다.");
+            throw new BusinessException(ErrorCode.DUPLICATE_RECORD, "이미 해당 순번의 인슐린 기록이 존재합니다.");
         }
 
         InsulinRecord record = InsulinRecord.create(

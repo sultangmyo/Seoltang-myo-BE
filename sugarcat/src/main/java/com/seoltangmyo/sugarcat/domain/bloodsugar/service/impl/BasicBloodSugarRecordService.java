@@ -54,7 +54,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 cat, request.recordedDate(), request.sequence())) {
             log.warn("[혈당 기록 저장 실패] 중복 기록 - catId={}, date={}, sequence={}",
                     cat.getId(), request.recordedDate(), request.sequence());
-            throw new IllegalArgumentException("이미 해당 순번의 혈당 기록이 존재합니다.");
+            throw new BusinessException(ErrorCode.DUPLICATE_RECORD, "이미 해당 순번의 혈당 기록이 존재합니다.");
         }
 
         SugarStatus sugarStatus = SugarStatus.from(request.sugarValue());
