@@ -42,7 +42,7 @@ public class InsulinRecordService {
         if(!request.isInjected()) {
             log.warn("[인슐린 기록 저장 실패] isInjected=false 요청 - userId={}, date={}, sequence={}",
                     userId, request.recordDate(), request.sequence());
-            throw new IllegalArgumentException("인슐린 투여 기록은 투여한 경우에만 저장할 수 있습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "인슐린 투여 기록은 투여한 경우에만 저장할 수 있습니다.");
         }
 
         User user = userRepository.findById(userId)

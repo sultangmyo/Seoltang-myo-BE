@@ -105,7 +105,7 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
 
     private void validateWeeklyPeriod(String period) {
         if (!WEEKLY.equalsIgnoreCase(period)) {
-            throw new IllegalArgumentException("period는 weekly만 가능합니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "period는 weekly만 가능합니다.");
         }
     }
 
@@ -176,7 +176,7 @@ public class BasicBloodSugarStatisticService implements BloodSugarStatisticServi
 
     private void validateMonthlyPeriod(String period) {
         if (!MONTHLY.equalsIgnoreCase(period)) {
-            throw new IllegalArgumentException("period는 monthly만 가능합니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "period는 monthly만 가능합니다.");
         }
     }
 

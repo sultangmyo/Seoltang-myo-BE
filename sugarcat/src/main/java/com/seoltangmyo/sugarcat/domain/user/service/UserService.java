@@ -139,16 +139,16 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        user.updateSingleNotification(type, request.isEnabled());
-
         // type별 응답 메시지
         String message = switch (type) {
             case "insulin" -> "인슐린 알람이 수정되었습니다.";
             case "blood"   -> "혈당 알림이 수정되었습니다.";
             case "meal"    -> "식이 알람이 수정되었습니다.";
             case "weekly"  -> "주간 리포트 알림이 수정되었습니다.";
-            default -> throw new IllegalArgumentException("알 수 없는 알림 타입입니다: " + type);
+            default -> throw new BusinessException(ErrorCode.INVALID_INPUT, "알 수 없는 알림 타입입니다: " + type);
         };
+
+        user.updateSingleNotification(type, request.isEnabled());
 
         log.info("[알림 개별 수정 완료] userId={}, type={}", userId, type);
 

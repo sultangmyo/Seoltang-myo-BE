@@ -27,7 +27,7 @@ public class BasicPushTokenService implements PushTokenService {
     public void registerDeviceToken(UUID userId, DeviceTokenRequest request) {
 
         if (request.platform() != PlatformType.IOS) {
-            throw new IllegalArgumentException("지원하지 않는 플랫폼입니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "지원하지 않는 플랫폼입니다.");
         }
 
         User user = userRepository.findById(userId)

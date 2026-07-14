@@ -155,7 +155,7 @@ public class BasicCatExportService implements CatExportService {
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("시작 날짜는 종료 날짜보다 늦을 수 없습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "시작 날짜는 종료 날짜보다 늦을 수 없습니다.");
         }
     }
 }
