@@ -1,7 +1,9 @@
 package com.seoltangmyo.sugarcat.global.error;
 
+import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -108,11 +110,21 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.from(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE));
     }
 
-    // 서버 내부 오류 (카카오 서버 5xx 오류 등 IllegalStateException)
+    // DB/JPA 오류
+    // → 500 Internal Server Error
+    @ExceptionHandler({DataAccessException.class, PersistenceException.class})
+    public ResponseEntity<ErrorResponse> handleDatabaseException(Exception e) {
+        log.error("데이터베이스 처리 중 서버 오류", e);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR));
+    }
+
+    // 서버 내부 상태 오류
     // → 500 Internal Server Error
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException e) {
-        log.error("서버 내부 오류 (IllegalStateException): {}", e.getMessage());
+        log.error("서버 내부 상태 오류", e);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR));
