@@ -6,6 +6,8 @@ import com.seoltangmyo.sugarcat.domain.auth.dto.*;
 import com.seoltangmyo.sugarcat.domain.user.entity.ProviderType;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import com.seoltangmyo.sugarcat.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,29 +77,33 @@ public class AuthService {
 
     @Transactional
     public TokenRefreshResponse refresh(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw invalidRefreshToken();
+        }
+
         if (!jwtProvider.validate(refreshToken)) { // 토큰 형식/서명/만료 검증
-            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+            throw invalidRefreshToken();
         }
 
         if (!"REFRESH".equals(jwtProvider.getType(refreshToken))) { // Refresh Token인지 확인
-            throw new IllegalArgumentException("Refresh Token이 아닙니다.");
+            throw invalidRefreshToken();
         }
 
         UUID userId = jwtProvider.getUserId(refreshToken); // 토큰에서 userId 추출
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(this::invalidRefreshToken);
 
         if (user.getRefreshToken() == null) { // 서버에 저장된 refresh token이 없으면 로그아웃 상태로 판단
-            throw new IllegalArgumentException("저장된 Refresh Token이 없습니다.");
+            throw invalidRefreshToken();
         }
 
         if (!user.getRefreshToken().equals(refreshToken)) { // 프론트가 보낸 토큰과 DB 저장값 비교
-            throw new IllegalArgumentException("Refresh Token이 일치하지 않습니다.");
+            throw invalidRefreshToken();
         }
 
         if (user.getRefreshTokenExpiresAt() == null || user.getRefreshTokenExpiresAt().isBefore(Instant.now())) {
-            throw new IllegalArgumentException("Refresh Token이 만료되었습니다.");
+            throw invalidRefreshToken();
         }
 
         String newAccessToken = jwtProvider.createAccessToken(user.getId()); // 새 Access Token 발급
@@ -179,5 +185,9 @@ public class AuthService {
         }
 
         return id.toString();
+    }
+
+    private BusinessException invalidRefreshToken() {
+        return new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
     }
 }
