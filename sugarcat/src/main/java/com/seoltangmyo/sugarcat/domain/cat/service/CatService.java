@@ -204,4 +204,15 @@ public class CatService {
             careScheduleRepository.save(schedule);
         }
     }
+
+    @Transactional
+    public void deleteCat(Cat cat) {
+        UUID catId = cat.getId();
+
+        catCacheEvictService.evictAllCatRelatedCaches(catId);
+
+        catRepository.delete(cat);
+
+        log.info("[고양이 삭제 완료] catId={}", catId);
+    }
 }
