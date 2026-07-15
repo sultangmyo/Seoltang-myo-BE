@@ -6,6 +6,9 @@ import com.seoltangmyo.sugarcat.domain.schedule.entity.CareScheduleType;
 import com.seoltangmyo.sugarcat.domain.schedule.service.CareScheduleService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Tag(name = "CareSchedule", description = "케어 스케줄 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/care_schedules/me")
@@ -28,9 +32,10 @@ public class CareScheduleController {
 
     // 식사 정보 조회
     // GET /api/v1/care_schedules/me/meal
+    @Operation(summary = "식사 스케줄 조회")
     @GetMapping("/meal")
     public ResponseEntity<CareScheduleInfoResponse> getMealSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(careScheduleService.getSchedules(userId, CareScheduleType.MEAL));
@@ -38,9 +43,10 @@ public class CareScheduleController {
 
     // 혈당 체크 정보 조회
     // GET /api/v1/care_schedules/me/blood-sugar
+    @Operation(summary = "혈당 스케줄 조회")
     @GetMapping("/blood-sugar")
     public ResponseEntity<CareScheduleInfoResponse> getBloodSugarSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(careScheduleService.getSchedules(userId, CareScheduleType.BLOODSUGAR));
@@ -48,9 +54,10 @@ public class CareScheduleController {
 
     // 인슐린 정보 조회
     // GET /api/v1/care_schedules/me/insulin
+    @Operation(summary = "인슐린 스케줄 조회")
     @GetMapping("/insulin")
     public ResponseEntity<CareScheduleInfoResponse> getInsulinSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
 
@@ -71,9 +78,10 @@ public class CareScheduleController {
 
     // 식사 설정 수정
     // PATCH /api/v1/care_schedules/me/meal
+    @Operation(summary = "식사 스케줄 수정")
     @PatchMapping("/meal")
     public ResponseEntity<MessageResponse> updateMealSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CareScheduleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -82,9 +90,10 @@ public class CareScheduleController {
 
     // 혈당 체크 설정 수정
     // PATCH /api/v1/care_schedules/me/blood-sugar
+    @Operation(summary = "혈당 스케줄 수정")
     @PatchMapping("/blood-sugar")
     public ResponseEntity<MessageResponse> updateBloodSugarSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CareScheduleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -93,9 +102,10 @@ public class CareScheduleController {
 
     // 인슐린 설정 수정
     // PATCH /api/v1/care_schedules/me/insulin
+    @Operation(summary = "인슐린 스케줄 수정")
     @PatchMapping("/insulin")
     public ResponseEntity<MessageResponse> updateInsulinSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CareScheduleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();

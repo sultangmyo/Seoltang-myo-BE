@@ -8,6 +8,9 @@ import com.seoltangmyo.sugarcat.domain.user.dto.NotificationUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.UserMeResponse;
 import com.seoltangmyo.sugarcat.domain.user.service.UserService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Tag(name = "User", description = "사용자 API")
 @RestController
 @RequestMapping("/api/v1/users/me")
 @RequiredArgsConstructor
@@ -30,9 +34,10 @@ public class UserController {
 
     // 내 정보 조회 (닉네임 + 가족 집사 목록)
     // GET /api/v1/users/me
+    @Operation(summary = "내 정보 조회", description = "닉네임 + 같은 고양이를 가진 집사 목록")
     @GetMapping
     public ResponseEntity<UserMeResponse> getUserMe(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
         UserMeResponse response = userService.getUserMe(userId);
@@ -42,9 +47,10 @@ public class UserController {
     // 닉네임 수정
     // PATCH /api/v1/users/me/nickname
     // 온보딩 2단계 및 마이페이지 공용
+    @Operation(summary = "닉네임 수정")
     @PatchMapping("/nickname")
     public ResponseEntity<MessageResponse> updateNickname(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody NicknameUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -55,9 +61,10 @@ public class UserController {
     // 알림 전체 수정
     // PATCH /api/v1/users/me/notification
     // 온보딩 4단계: 알림 허용 시 true, 거부 시 false 전달 (type 파라미터 없을 때)
+    @Operation(summary = "알림 전체 수정", description = "type 파라미터 없이 호출 시 4가지 알림 전체 ON/OFF")
     @PatchMapping(value = "/notification", params = "!type")
     public ResponseEntity<MessageResponse> updateNotification(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody NotificationUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -67,9 +74,10 @@ public class UserController {
 
     // 알림 정보 조회
     // GET /api/v1/users/me/notification
+    @Operation(summary = "알림 정보 조회")
     @GetMapping("/notification")
     public ResponseEntity<NotificationInfoResponse> getNotificationInfo(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.getNotificationInfo(userId));
@@ -78,9 +86,10 @@ public class UserController {
     // 알림 개별 수정
     // PATCH /api/v1/users/me/notification?type={type}
     // type: insulin / blood / meal / weekly
+    @Operation(summary = "알림 개별 수정", description = "type: insulin / blood / meal / weekly")
     @PatchMapping(value = "/notification", params = "type")
     public ResponseEntity<MessageResponse> updateSingleNotification(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("type") String type,
             @RequestBody NotificationSingleUpdateRequest request
     ) {
@@ -90,9 +99,10 @@ public class UserController {
 
     // 사용자 삭제
     // DELETE /api/v1/users/me
+    @Operation(summary = "사용자 탈퇴")
     @DeleteMapping
     public ResponseEntity<MessageResponse> deleteUser(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.deleteUser(userId));

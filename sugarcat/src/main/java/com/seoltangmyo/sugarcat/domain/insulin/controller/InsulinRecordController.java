@@ -5,6 +5,9 @@ import com.seoltangmyo.sugarcat.domain.insulin.dto.InsulinRecordListResponse;
 import com.seoltangmyo.sugarcat.domain.insulin.service.InsulinRecordService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Tag(name = "Insulin", description = "인슐린 기록 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/insulin-records")
@@ -31,9 +35,10 @@ public class InsulinRecordController {
 
     // 날짜별 인슐린 투여 기록 조회
     // GET /api/v1/insulin-records/me?date={date}
+    @Operation(summary = "날짜별 인슐린 기록 조회")
     @GetMapping("/me")
     public ResponseEntity<InsulinRecordListResponse> getInsulinRecords(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         // 로그인한 사용자의 id를 꺼냄
@@ -55,9 +60,10 @@ public class InsulinRecordController {
 
     // 인슐린 투여 기록 저장
     // POST /api/v1/insulin-records/me
+    @Operation(summary = "인슐린 기록 저장")
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createInsulinRecord(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody InsulinRecordCreateRequest request
     ) {
         // 로그인한 사용자의 id를 꺼냄
