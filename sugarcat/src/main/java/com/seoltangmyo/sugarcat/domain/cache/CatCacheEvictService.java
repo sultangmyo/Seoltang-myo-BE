@@ -76,27 +76,28 @@ public class CatCacheEvictService {
     public void evictAllRecordCaches() {}
 
     // 마지막 사용자 탈퇴 (= 고양이 삭제)
-//    @Caching(evict = {
-//            @CacheEvict(
-//                    cacheNames = "catInfo",
-//                    key = "#catId"
-//            ),
-//            @CacheEvict(
-//                    cacheNames = "careSchedules",
-//                    allEntries = true
-//            ),
-//            @CacheEvict(
-//                    cacheNames = "dailyMealRecords",
-//                    allEntries = true
-//            ),
-//            @CacheEvict(
-//                    cacheNames = "dailyBloodSugarRecords",
-//                    allEntries = true
-//            ),
-//            @CacheEvict(
-//                    cacheNames = "dailyInsulinRecords",
-//                    allEntries = true
-//            )
-//    })
-//    public void evictAllCatRelatedCaches(UUID catId) {}
+    // 고양이 정보, 스케줄, 기록 관련 캐시 전체 삭제
+    @Caching(evict = {
+            @CacheEvict(
+                    cacheNames = "catInfo",
+                    key = "#catId"
+            ),
+            @CacheEvict(
+                    cacheNames = "careSchedules",
+                    allEntries = true
+            ),
+            @CacheEvict(
+                    cacheNames = "dailyMealRecords",
+                    allEntries = true
+            ),
+            @CacheEvict(
+                    cacheNames = "dailyBloodSugarRecords",
+                    allEntries = true
+            ),
+            @CacheEvict(
+                    cacheNames = "dailyInsulinRecords",
+                    allEntries = true
+            )
+    })
+    public void evictAllCatRelatedCaches(UUID catId) {}
 }
