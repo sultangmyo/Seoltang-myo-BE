@@ -102,7 +102,17 @@ public class AuthService {
 
         String newAccessToken = jwtProvider.createAccessToken(user.getId()); // 새 Access Token 발급
 
-        return new TokenRefreshResponse(newAccessToken, user.getId()); // 명세에 맞게 accessToken + userId 반환
+        String newRefreshToken = jwtProvider.createRefreshToken(user.getId()); // 새 Refresh Token 발급
+
+        Instant newRefreshTokenExpiresAt = jwtProvider.getExpiration(newRefreshToken); // 새 Refresh Token 만료 시간 추출
+
+        user.updateRefreshToken(newRefreshToken, newRefreshTokenExpiresAt); // DB에 새 Refresh Token으로 교체
+
+        return new TokenRefreshResponse(
+                newAccessToken, // 새 Access Token 응답
+                newRefreshToken, // 새 Refresh Token 응답
+                user.getId() // 사용자 ID 응답
+        );
     }
 
     @Transactional

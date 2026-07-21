@@ -250,7 +250,7 @@ public class BasicNotificationService implements NotificationService {
     private String createWeeklyReportBody(String catName, long totalCount, long lowCount, long highCount) {
         // 기록이 하나도 없는 경우
         if (totalCount == 0) {
-            return catName + "은 이번 주 어떻게 지냈나요? 지금 기록하고 다음 주 건강 리포트를 받아보세요.";
+            return catName + "는 이번 주 어떻게 지냈나요? 지금 기록하고 다음 주 건강 리포트를 받아보세요.";
         }
 
         // 고혈당/저혈당이 하나도 없는 경우
@@ -259,7 +259,7 @@ public class BasicNotificationService implements NotificationService {
         }
 
         // 고혈당/저혈당 기록이 있는 경우
-        return "저번주 저혈당은 " + lowCount + "번, 고혈당은 " + highCount + "번 있었어요.";
+        return "저번 주 저혈당은 " + lowCount + "번, 고혈당은 " + highCount + "번 있었어요.";
     }
 
 
