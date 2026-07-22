@@ -3,10 +3,13 @@ spring:
     name: sugarcat
 
   profiles:
-    active: local
-    include: secret
+    default: local
+    group:
+      prod:
+        - secret
+      local:
+        - secret
 
-  # JPA 공통
   jpa:
     open-in-view: false
     properties:
@@ -29,13 +32,6 @@ spring:
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=30m
 
-# 서버 설정
 server:
   address: 0.0.0.0
   port: 8080
-
-# 로깅
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
