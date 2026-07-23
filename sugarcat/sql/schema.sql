@@ -173,7 +173,3 @@ CREATE TABLE insulin_records
 -- 인덱스 추가
 -- =========================================
 CREATE INDEX idx_users_cat_id ON users (cat_id);
-CREATE INDEX idx_care_schedules_cat_id ON care_schedules (cat_id);
-CREATE INDEX idx_blood_sugar_records_cat_date ON blood_sugar_records (cat_id, record_date);
-CREATE INDEX idx_meal_records_cat_date ON meal_records (cat_id, record_date);
-CREATE INDEX idx_insulin_records_cat_date ON insulin_records (cat_id, record_date);
