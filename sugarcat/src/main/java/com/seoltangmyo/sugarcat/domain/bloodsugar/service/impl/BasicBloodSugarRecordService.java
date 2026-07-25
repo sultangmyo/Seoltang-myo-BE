@@ -11,6 +11,8 @@ import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordServic
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,16 +42,19 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 userId, request.recordedDate(), request.sequence(), request.sugarValue());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         // 같은 날짜 + 순번 기록 중복 저장 방지
         if (bloodSugarRecordRepository.existsByCatAndRecordDateAndSequence(
                 cat, request.recordedDate(), request.sequence())) {
             log.warn("[혈당 기록 저장 실패] 중복 기록 - catId={}, date={}, sequence={}",
                     cat.getId(), request.recordedDate(), request.sequence());
-            throw new IllegalArgumentException("이미 해당 순번의 혈당 기록이 존재합니다.");
+            throw new BusinessException(ErrorCode.DUPLICATE_RECORD, "이미 해당 순번의 혈당 기록이 존재합니다.");
         }
 
         SugarStatus sugarStatus = SugarStatus.from(request.sugarValue());
@@ -93,9 +98,12 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
         log.info("[혈당 기록 조회] userId={}, date={}", userId, date);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         return bloodSugarRecordQueryService.getBloodSugarRecordsByDate(
                 cat.getId(),
@@ -112,9 +120,12 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
         log.info("[혈당 기록 수정] userId={}, date={}, sequence={}", userId, request.recordedDate(), request.sequence());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         BloodSugarRecord bloodSugarRecord =
                 bloodSugarRecordRepository.findByCatAndRecordDateAndSequence(
@@ -124,7 +135,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                 ).orElseThrow(() -> {
                     log.warn("[혈당 기록 수정 실패] 기록 없음 - catId={}, date={}, sequence={}",
                             cat.getId(), request.recordedDate(), request.sequence());
-                    return new IllegalArgumentException("혈당 기록을 찾을 수 없습니다.");
+                    return new BusinessException(ErrorCode.RECORD_NOT_FOUND);
                 });
 
         SugarStatus sugarStatus = SugarStatus.from(request.sugarValue());
@@ -156,9 +167,12 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
         log.info("[혈당 기록 삭제] userId={}, date={}, sequence={}", userId, date, sequence);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         BloodSugarRecord bloodSugarRecord =
                 bloodSugarRecordRepository.findByCatAndRecordDateAndSequence(
@@ -167,7 +181,7 @@ public class BasicBloodSugarRecordService implements BloodSugarRecordService {
                         sequence
                 ).orElseThrow(() -> {
                     log.warn("[혈당 기록 삭제 실패] 기록 없음 - catId={}, date={}, sequence={}", cat.getId(), date, sequence);
-                    return new IllegalArgumentException("혈당 기록을 찾을 수 없습니다.");
+                    return new BusinessException(ErrorCode.RECORD_NOT_FOUND);
                 });
 
         bloodSugarRecordRepository.delete(bloodSugarRecord);

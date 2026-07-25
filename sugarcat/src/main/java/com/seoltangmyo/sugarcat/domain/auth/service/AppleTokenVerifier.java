@@ -3,6 +3,8 @@ package com.seoltangmyo.sugarcat.domain.auth.service;
 import com.seoltangmyo.sugarcat.domain.auth.client.AppleApiClient;
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKey;
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKeyResponse;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +40,7 @@ public class AppleTokenVerifier {
 
         if (identityToken == null || identityToken.isBlank()) {
             log.warn("##log## 애플검증 - identityToken 없음");
-            throw new IllegalArgumentException("Apple identityToken은 필수입니다.");
+            throw invalidInput("Apple identityToken은 필수입니다.");
         }
 
         log.info("##log## 애플검증 - 헤더 파싱 시작");
@@ -53,12 +55,12 @@ public class AppleTokenVerifier {
 
         if (kid == null || alg == null) {
             log.warn("##log## 애플검증 - kid 또는 alg 없음");
-            throw new IllegalArgumentException("Apple identityToken 헤더가 올바르지 않습니다.");
+            throw invalidInput("Apple identityToken 헤더가 올바르지 않습니다.");
         }
 
         if (!"RS256".equals(alg)) {
             log.warn("##log## 애플검증 - 지원하지 않는 alg: {}", alg);
-            throw new IllegalArgumentException("지원하지 않는 Apple identityToken 알고리즘입니다: " + alg);
+            throw invalidInput("지원하지 않는 Apple identityToken 알고리즘입니다: " + alg);
         }
 
         log.info("##log## 애플검증 - Apple 공개키 조회 시작");
@@ -83,7 +85,7 @@ public class AppleTokenVerifier {
 
         if (subject == null || subject.isBlank()) {
             log.warn("##log## 애플검증 - subject 없음");
-            throw new IllegalArgumentException("Apple identityToken에 subject가 없습니다.");
+            throw invalidInput("Apple identityToken에 subject가 없습니다.");
         }
 
         log.info("##log## 애플검증 - subject 추출 성공");
@@ -97,7 +99,7 @@ public class AppleTokenVerifier {
             String[] tokenParts = identityToken.split("\\."); // JWT를 header, payload, signature로 분리
 
             if (tokenParts.length != 3) {
-                throw new IllegalArgumentException("identityToken 형식이 올바르지 않습니다.");
+                throw invalidInput("identityToken 형식이 올바르지 않습니다.");
             }
 
             String headerBase64 = tokenParts[0];
@@ -112,11 +114,11 @@ public class AppleTokenVerifier {
                     }
             );
 
-        } catch (IllegalArgumentException e) {
+        } catch (BusinessException e) {
             throw e;
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("identityToken 헤더 파싱에 실패했습니다.", e);
+            throw invalidInput("identityToken 헤더 파싱에 실패했습니다.");
         }
     }
 
@@ -124,14 +126,14 @@ public class AppleTokenVerifier {
         ApplePublicKeyResponse response = appleApiClient.getPublicKeys();
 
         if (response == null || response.keys() == null) {
-            throw new IllegalArgumentException("Apple 공개키를 가져오지 못했습니다.");
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
         }
 
         return response.keys().stream()
                 .filter(key -> key.kid().equals(kid))
                 .filter(key -> key.alg().equals(alg))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Apple identityToken과 일치하는 공개키가 없습니다."));
+                .orElseThrow(() -> invalidInput("Apple identityToken과 일치하는 공개키가 없습니다."));
     }
 
     private PublicKey createPublicKey(ApplePublicKey applePublicKey) {
@@ -148,7 +150,11 @@ public class AppleTokenVerifier {
 
             return keyFactory.generatePublic(publicKeySpec);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Apple 공개키 생성에 실패했습니다.", e);
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
         }
+    }
+
+    private BusinessException invalidInput(String message) {
+        return new BusinessException(ErrorCode.INVALID_INPUT, message);
     }
 }

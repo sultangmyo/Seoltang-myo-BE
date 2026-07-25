@@ -8,6 +8,7 @@ import com.seoltangmyo.sugarcat.domain.user.dto.NotificationUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.user.dto.UserMeResponse;
 import com.seoltangmyo.sugarcat.domain.user.service.UserService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,7 +46,7 @@ public class UserController {
     @PatchMapping("/nickname")
     public ResponseEntity<MessageResponse> updateNickname(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody NicknameUpdateRequest request
+            @Valid @RequestBody NicknameUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         MessageResponse response = userService.updateNickname(userId, request);
@@ -58,7 +59,7 @@ public class UserController {
     @PatchMapping(value = "/notification", params = "!type")
     public ResponseEntity<MessageResponse> updateNotification(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody NotificationUpdateRequest request
+            @Valid @RequestBody NotificationUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         MessageResponse response = userService.updateNotification(userId, request);
@@ -82,7 +83,7 @@ public class UserController {
     public ResponseEntity<MessageResponse> updateSingleNotification(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("type") String type,
-            @RequestBody NotificationSingleUpdateRequest request
+            @Valid @RequestBody NotificationSingleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.updateSingleNotification(userId, type, request));

@@ -10,6 +10,8 @@ import com.seoltangmyo.sugarcat.domain.insulin.repository.InsulinRecordRepositor
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,17 +42,17 @@ public class InsulinRecordService {
         if(!request.isInjected()) {
             log.warn("[인슐린 기록 저장 실패] isInjected=false 요청 - userId={}, date={}, sequence={}",
                     userId, request.recordDate(), request.sequence());
-            throw new IllegalArgumentException("인슐린 투여 기록은 투여한 경우에만 저장할 수 있습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "인슐린 투여 기록은 투여한 경우에만 저장할 수 있습니다.");
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
 
         if (cat == null) {
             log.warn("[인슐린 기록 저장 실패] 고양이 없음 - userId={}", userId);
-            throw new IllegalArgumentException("등록된 고양이가 없습니다.");
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
         }
 
         boolean exists = insulinRecordRepository.existsByCatAndRecordDateAndSequence(
@@ -60,7 +62,7 @@ public class InsulinRecordService {
         if (exists) {
             log.warn("[인슐린 기록 저장 실패] 중복 기록 - catId={}, date={}, sequence={}",
                     cat.getId(), request.recordDate(), request.sequence());
-            throw new IllegalArgumentException("이미 해당 순번의 인슐린 기록이 존재합니다.");
+            throw new BusinessException(ErrorCode.DUPLICATE_RECORD, "이미 해당 순번의 인슐린 기록이 존재합니다.");
         }
 
         InsulinRecord record = InsulinRecord.create(
@@ -96,9 +98,12 @@ public class InsulinRecordService {
         log.info("[인슐린 기록 조회] userId={}, date={}", userId, date);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         return insulinRecordQueryService.getInsulinRecords(
                 cat.getId(),
