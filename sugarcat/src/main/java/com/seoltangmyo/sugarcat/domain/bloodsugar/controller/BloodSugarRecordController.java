@@ -6,6 +6,7 @@ import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordListRespon
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,7 +30,7 @@ public class BloodSugarRecordController {
     @PostMapping("/me")
     public ResponseEntity<BloodSugarRecordCreateResponse> createBloodSugarRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody BloodSugarRecordCreateRequest request
+            @Valid @RequestBody BloodSugarRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 
@@ -74,7 +75,7 @@ public class BloodSugarRecordController {
     @PatchMapping("/me")
     public ResponseEntity<Void> updateBloodSugarRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody BloodSugarRecordUpdateRequest request
+            @Valid @RequestBody BloodSugarRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 

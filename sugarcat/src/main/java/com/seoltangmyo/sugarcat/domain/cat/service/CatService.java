@@ -14,13 +14,13 @@ import com.seoltangmyo.sugarcat.domain.schedule.repository.CareScheduleRepositor
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +63,7 @@ public class CatService {
 
         // 2. 현재 사용자와 고양이 연결
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         user.assignCat(cat);
 
         // 3. 루틴 스케줄 저장
@@ -79,6 +79,7 @@ public class CatService {
 
     private static final String INVITE_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int INVITE_CODE_LENGTH = 8;
+    private static final String INVITE_CODE_PATTERN = "^[A-Z0-9]{8}$";
 
     // 초대코드 조회
     // GET /api/v1/cats/me/invite-code
@@ -87,9 +88,12 @@ public class CatService {
         log.info("[초대코드 조회] userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         log.info("[초대코드 조회 완료] catId={}", cat.getId());
 
@@ -103,9 +107,12 @@ public class CatService {
         log.info("[초대코드 생성] userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         String newCode = createRandomCode();
         cat.assignInviteCode(newCode);
@@ -135,14 +142,18 @@ public class CatService {
     public InviteCodeValidateResponse validateInviteCode(UUID userId, String inviteCode) {
         log.info("[초대코드 검증] userId={}, inviteCode={}", userId, inviteCode);
 
+        if (inviteCode == null || inviteCode.isBlank() || !inviteCode.matches(INVITE_CODE_PATTERN)) {
+            throw new BusinessException(ErrorCode.INVALID_INVITE_CODE_FORMAT);
+        }
+
         Cat cat = catRepository.findByInviteCode(inviteCode)
                 .orElseThrow(() -> {
                     log.warn("[초대코드 검증 실패] 존재하지 않는 코드 - inviteCode={}", inviteCode);
-                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "초대코드가 존재하지 않습니다.");
+                    return new BusinessException(ErrorCode.INVITE_CODE_NOT_FOUND);
                 });
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.assignCat(cat);
 
@@ -158,9 +169,12 @@ public class CatService {
         log.info("[고양이 정보 조회] userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         log.info("[고양이 정보 조회 완료] catId={}", cat.getId());
 
@@ -174,9 +188,12 @@ public class CatService {
         log.info("[고양이 정보 수정] userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         // 더티체킹으로 자동 반영
         cat.updateInfo(request.name(), request.birthDate(), request.diagnosedDate());

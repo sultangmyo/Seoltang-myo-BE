@@ -11,6 +11,8 @@ import com.seoltangmyo.sugarcat.domain.meal.entity.MealRecord;
 import com.seoltangmyo.sugarcat.domain.meal.repository.MealRecordRepository;
 import com.seoltangmyo.sugarcat.domain.user.entity.User;
 import com.seoltangmyo.sugarcat.domain.user.repository.UserRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +41,12 @@ public class BasicCatExportService implements CatExportService {
         validateDateRange(startDate, endDate);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Cat cat = user.getCat();
+        if (cat == null) {
+            throw new BusinessException(ErrorCode.CAT_NOT_FOUND);
+        }
 
         int insulinCount = cat.getInsulinCount();
 
@@ -150,7 +155,7 @@ public class BasicCatExportService implements CatExportService {
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("시작 날짜는 종료 날짜보다 늦을 수 없습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "시작 날짜는 종료 날짜보다 늦을 수 없습니다.");
         }
     }
 }

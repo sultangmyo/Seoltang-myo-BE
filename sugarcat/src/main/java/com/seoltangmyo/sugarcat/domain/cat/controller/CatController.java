@@ -9,14 +9,12 @@ import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
 import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
 import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
-import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
-import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +54,7 @@ public class CatController {
     @PatchMapping("/me")
     public ResponseEntity<MessageResponse> updateCatInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CatInfoUpdateRequest request
+            @Valid @RequestBody CatInfoUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(catService.updateCatInfo(userId, request));
@@ -103,7 +101,7 @@ public class CatController {
     @PostMapping
     public ResponseEntity<MessageResponse> createCat(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CatCreateRequest request
+            @Valid @RequestBody CatCreateRequest request
     ) {
         log.info("##log## 고양이등록 컨트롤러 - request = {}", request);
         log.info("##log## 고양이등록 컨트롤러 - cat null 여부 = {}", request.cat() == null);

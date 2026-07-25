@@ -3,6 +3,7 @@ package com.seoltangmyo.sugarcat.domain.notification.controller;
 import com.seoltangmyo.sugarcat.domain.notification.dto.DeviceTokenRequest;
 import com.seoltangmyo.sugarcat.domain.notification.service.PushTokenService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +24,7 @@ public class NotificationController {
     @PostMapping("/device-token")
     public ResponseEntity<Void> registerDeviceToken(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody DeviceTokenRequest request
+            @Valid @RequestBody DeviceTokenRequest request
     ){
         UUID userId = userDetails.getUserId();
         pushTokenService.registerDeviceToken(userId, request);
