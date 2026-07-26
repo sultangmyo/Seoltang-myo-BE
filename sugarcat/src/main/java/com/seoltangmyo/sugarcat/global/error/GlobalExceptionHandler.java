@@ -16,6 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 // 공통 에러 응답 포맷: {"status": xxx, "code": "...", "message": "..."}
 // 프론트(iOS)는 status/code 기준으로 필요한 에러만 분기하고, 나머지는 공통 안내로 처리
@@ -62,9 +63,14 @@ public class GlobalExceptionHandler {
     // → 400 Bad Request
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        String message = e.getBindingResult().getFieldErrors().stream()
-                .findFirst().filter(error -> error.getDefaultMessage() != null).map(DefaultMessageSourceResolvable::getDefaultMessage).orElse(ErrorCode.INVALID_INPUT.getMessage());
-
+        log.warn("@Valid 검증 실패: {}", e.getBindingResult().getFieldErrors());
+        String message = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(ErrorCode.INVALID_INPUT.getMessage());
         return ResponseEntity
                 .badRequest()
                 .body(ErrorResponse.of(ErrorCode.INVALID_INPUT, message));

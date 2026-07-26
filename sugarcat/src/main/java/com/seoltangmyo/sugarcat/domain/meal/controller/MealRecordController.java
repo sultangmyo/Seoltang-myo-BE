@@ -6,6 +6,9 @@ import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.meal.service.MealRecordService;
 import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Tag(name = "Meal", description = "식사 기록 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/meals")
@@ -34,9 +38,10 @@ public class MealRecordController {
 
     // 날짜별 식사 기록 조회
     // GET /api/v1/meals/me?date={date}
+    @Operation(summary = "날짜별 식사 기록 조회")
     @GetMapping("/me")
     public ResponseEntity<MealRecordListResponse> getMealRecords(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         UUID userId = userDetails.getUserId();
@@ -58,9 +63,10 @@ public class MealRecordController {
 
     // 식사 기록 저장
     // POST /api/v1/meals/me
+    @Operation(summary = "식사 기록 저장")
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createMealRecord(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody MealRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -82,9 +88,10 @@ public class MealRecordController {
 
     // 식사 기록 수정
     // PATCH /api/v1/meals/me
+    @Operation(summary = "식사 기록 수정")
     @PatchMapping("/me")
     public ResponseEntity<MessageResponse> updateMealRecord(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody MealRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
