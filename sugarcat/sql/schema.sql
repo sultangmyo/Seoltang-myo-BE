@@ -1,23 +1,12 @@
 -- ===========================
 -- DROP TABLES
 -- ===========================
-DROP TABLE IF EXISTS blood_sugar_statistics; -- 추후에 삭제
 DROP TABLE IF EXISTS insulin_records;
 DROP TABLE IF EXISTS meal_records;
 DROP TABLE IF EXISTS blood_sugar_records;
 DROP TABLE IF EXISTS care_schedules;
-DROP TABLE IF EXISTS cat_care_settings; -- 추후에 삭제
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS cats;
-
--- ===========================
--- DROP ENUM TYPES (추후에 삭제 예정)
--- ===========================
-DROP TYPE IF EXISTS period_type_enum;
-DROP TYPE IF EXISTS meal_status_enum;
-DROP TYPE IF EXISTS sugar_status_enum;
-DROP TYPE IF EXISTS schedule_type_enum;
-DROP TYPE IF EXISTS provider_type_enum;
 
 
 -- =========================================
@@ -184,7 +173,3 @@ CREATE TABLE insulin_records
 -- 인덱스 추가
 -- =========================================
 CREATE INDEX idx_users_cat_id ON users (cat_id);
-CREATE INDEX idx_care_schedules_cat_id ON care_schedules (cat_id);
-CREATE INDEX idx_blood_sugar_records_cat_date ON blood_sugar_records (cat_id, record_date);
-CREATE INDEX idx_meal_records_cat_date ON meal_records (cat_id, record_date);
-CREATE INDEX idx_insulin_records_cat_date ON insulin_records (cat_id, record_date);
