@@ -9,6 +9,7 @@ import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +83,7 @@ public class CareScheduleController {
     @PatchMapping("/meal")
     public ResponseEntity<MessageResponse> updateMealSchedule(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CareScheduleUpdateRequest request
+            @Valid @RequestBody CareScheduleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(careScheduleService.updateSchedules(userId, CareScheduleType.MEAL, request));
@@ -94,7 +95,7 @@ public class CareScheduleController {
     @PatchMapping("/blood-sugar")
     public ResponseEntity<MessageResponse> updateBloodSugarSchedule(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CareScheduleUpdateRequest request
+            @Valid @RequestBody CareScheduleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(careScheduleService.updateSchedules(userId, CareScheduleType.BLOODSUGAR, request));
@@ -106,7 +107,7 @@ public class CareScheduleController {
     @PatchMapping("/insulin")
     public ResponseEntity<MessageResponse> updateInsulinSchedule(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody CareScheduleUpdateRequest request
+            @Valid @RequestBody CareScheduleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(careScheduleService.updateSchedules(userId, CareScheduleType.INSULIN, request));

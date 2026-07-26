@@ -6,6 +6,8 @@ import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordListResponse;
 import com.seoltangmyo.sugarcat.domain.meal.dto.MealRecordResponse;
 import com.seoltangmyo.sugarcat.domain.meal.entity.MealRecord;
 import com.seoltangmyo.sugarcat.domain.meal.repository.MealRecordRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,7 +38,7 @@ public class MealRecordQueryService {
         log.info("[식사 기록 조회 - 캐시 미스] catId={}, date={}", catId, date);
 
         Cat cat = catRepository.findById(catId)
-                .orElseThrow(() -> new IllegalArgumentException("고양이를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CAT_NOT_FOUND));
 
         List<MealRecord> records =
                 mealRecordRepository.findAllByCatAndRecordDateOrderBySequenceAsc(cat, date);

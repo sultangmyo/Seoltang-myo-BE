@@ -3,6 +3,8 @@ package com.seoltangmyo.sugarcat.domain.cat.service;
 import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
 import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
 import com.seoltangmyo.sugarcat.domain.cat.repository.CatRepository;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +29,7 @@ public class CatInfoQueryService {
         log.info("[고양이 정보 조회 - 캐시 미스] catId={}", catId);
 
         Cat cat = catRepository.findById(catId)
-                .orElseThrow(() -> new IllegalArgumentException("고양이를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CAT_NOT_FOUND));
 
         return new CatInfoResponse(
                 cat.getName(),

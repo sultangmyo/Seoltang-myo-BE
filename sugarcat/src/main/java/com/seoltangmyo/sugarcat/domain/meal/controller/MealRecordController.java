@@ -9,6 +9,7 @@ import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -66,7 +67,7 @@ public class MealRecordController {
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createMealRecord(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody MealRecordCreateRequest request
+            @Valid @RequestBody MealRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 
@@ -91,7 +92,7 @@ public class MealRecordController {
     @PatchMapping("/me")
     public ResponseEntity<MessageResponse> updateMealRecord(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody MealRecordUpdateRequest request
+            @Valid @RequestBody MealRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
 

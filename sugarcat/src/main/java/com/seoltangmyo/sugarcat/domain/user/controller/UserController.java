@@ -11,6 +11,7 @@ import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,7 +52,7 @@ public class UserController {
     @PatchMapping("/nickname")
     public ResponseEntity<MessageResponse> updateNickname(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody NicknameUpdateRequest request
+            @Valid @RequestBody NicknameUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         MessageResponse response = userService.updateNickname(userId, request);
@@ -65,7 +66,7 @@ public class UserController {
     @PatchMapping(value = "/notification", params = "!type")
     public ResponseEntity<MessageResponse> updateNotification(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody NotificationUpdateRequest request
+            @Valid @RequestBody NotificationUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         MessageResponse response = userService.updateNotification(userId, request);
@@ -91,7 +92,7 @@ public class UserController {
     public ResponseEntity<MessageResponse> updateSingleNotification(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("type") String type,
-            @RequestBody NotificationSingleUpdateRequest request
+            @Valid @RequestBody NotificationSingleUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.updateSingleNotification(userId, type, request));

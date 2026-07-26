@@ -8,6 +8,7 @@ import com.seoltangmyo.sugarcat.domain.auth.dto.SocialLoginResponse;
 import com.seoltangmyo.sugarcat.domain.auth.dto.TokenRefreshResponse;
 import com.seoltangmyo.sugarcat.domain.auth.service.AuthService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +32,7 @@ public class AuthController {
     @Operation(summary = "애플 로그인")
     @PostMapping("/apple")
     public ResponseEntity<SocialLoginResponse> appleLogin(
-            @RequestBody AppleLoginRequest request
+            @Valid @RequestBody AppleLoginRequest request
     ) {
         log.info("body = {}", request);
         log.info("##log## 컨트롤러 - 애플로그인 진입 ");
@@ -43,7 +44,7 @@ public class AuthController {
     @Operation(summary = "카카오 로그인")
     @PostMapping("/kakao")
     public ResponseEntity<SocialLoginResponse> kakaoLogin(
-            @RequestBody KakaoLoginRequest request
+            @Valid @RequestBody KakaoLoginRequest request
     ) {
         log.info("body = {}", request);
         log.info("##log## 컨트롤러 - 카카오로그인 진입 ");
@@ -55,7 +56,7 @@ public class AuthController {
     @Operation(summary = "토큰 재발급")
     @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponse> refresh(
-            @RequestHeader("Refresh-Token") String refreshToken
+            @RequestHeader(value = "Refresh-Token", required = false) String refreshToken
     ) {
         TokenRefreshResponse response = authService.refresh(refreshToken);
         return ResponseEntity.ok(response);

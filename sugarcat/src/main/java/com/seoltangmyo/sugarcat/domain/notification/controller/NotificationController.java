@@ -6,6 +6,7 @@ import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +29,7 @@ public class NotificationController {
     @PostMapping("/device-token")
     public ResponseEntity<Void> registerDeviceToken(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody DeviceTokenRequest request
+            @Valid @RequestBody DeviceTokenRequest request
     ){
         UUID userId = userDetails.getUserId();
         pushTokenService.registerDeviceToken(userId, request);

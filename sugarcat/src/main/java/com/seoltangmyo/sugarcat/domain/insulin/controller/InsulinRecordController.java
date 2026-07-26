@@ -8,6 +8,7 @@ import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -64,7 +65,7 @@ public class InsulinRecordController {
     @PostMapping("/me")
     public ResponseEntity<MessageResponse> createInsulinRecord(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody InsulinRecordCreateRequest request
+            @Valid @RequestBody InsulinRecordCreateRequest request
     ) {
         // 로그인한 사용자의 id를 꺼냄
         UUID userId = userDetails.getUserId();

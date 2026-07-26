@@ -1,10 +1,15 @@
 package com.seoltangmyo.sugarcat.domain.auth.client;
 
 import com.seoltangmyo.sugarcat.domain.auth.dto.ApplePublicKeyResponse;
+import com.seoltangmyo.sugarcat.global.error.BusinessException;
+import com.seoltangmyo.sugarcat.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AppleApiClient {
@@ -14,9 +19,14 @@ public class AppleApiClient {
     private final RestClient restClient;
 
     public ApplePublicKeyResponse getPublicKeys() {
-        return restClient.get()
-                .uri(APPLE_PUBLIC_KEYS_URL)
-                .retrieve()
-                .body(ApplePublicKeyResponse.class);
+        try {
+            return restClient.get()
+                    .uri(APPLE_PUBLIC_KEYS_URL)
+                    .retrieve()
+                    .body(ApplePublicKeyResponse.class);
+        } catch (RestClientException e) {
+            log.error("Apple 공개키 조회 실패", e);
+            throw new BusinessException(ErrorCode.EXTERNAL_LOGIN_SERVICE_UNAVAILABLE);
+        }
     }
 }
