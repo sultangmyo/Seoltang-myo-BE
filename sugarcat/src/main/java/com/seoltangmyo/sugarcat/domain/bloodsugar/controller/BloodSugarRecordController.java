@@ -6,6 +6,9 @@ import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordListRespon
 import com.seoltangmyo.sugarcat.domain.bloodsugar.dto.BloodSugarRecordUpdateRequest;
 import com.seoltangmyo.sugarcat.domain.bloodsugar.service.BloodSugarRecordService;
 import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Tag(name = "BloodSugar", description = "혈당 기록 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/blood-sugar-records")
@@ -27,9 +31,10 @@ public class BloodSugarRecordController {
     private final BloodSugarRecordService bloodSugarRecordService;
 
     // 혈당 기록 저장
+    @Operation(summary = "혈당 기록 저장")
     @PostMapping("/me")
     public ResponseEntity<BloodSugarRecordCreateResponse> createBloodSugarRecord(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody BloodSugarRecordCreateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -48,9 +53,10 @@ public class BloodSugarRecordController {
     }
 
     // 날짜별 혈당 기록 조회
+    @Operation(summary = "날짜별 혈당 기록 조회")
     @GetMapping("/me")
     public ResponseEntity<BloodSugarRecordListResponse> getBloodSugarRecordsByDate(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         UUID userId = userDetails.getUserId();
@@ -72,9 +78,10 @@ public class BloodSugarRecordController {
     }
 
     // 혈당 기록 수정
+    @Operation(summary = "혈당 기록 수정")
     @PatchMapping("/me")
     public ResponseEntity<Void> updateBloodSugarRecord(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody BloodSugarRecordUpdateRequest request
     ) {
         UUID userId = userDetails.getUserId();
@@ -95,9 +102,10 @@ public class BloodSugarRecordController {
     }
 
     // 혈당 기록 삭제
+    @Operation(summary = "혈당 기록 삭제")
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteBloodSugarRecord(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam("sequence") int sequence
     ) {
