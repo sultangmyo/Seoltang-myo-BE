@@ -2,13 +2,20 @@
 
 **설탕묘** 서비스의 Spring Boot Backend Server입니다.
 
-
-## Overview
+## 📌 Overview
 
 설탕묘는 당뇨 고양이의 혈당, 식사, 인슐린 기록과 관리 일정을 공유하고 함께 관리할 수 있는 서비스입니다.
 
 ---
-## Tech Stack
+
+## 🚀 Deployment
+
+- **API Base URL**: https://api.sugarcat.site
+- **Swagger API Docs**: https://api.sugarcat.site/swagger-ui/index.html
+
+---
+
+## 🛠 Tech Stack
 
 - Java 21
 - Spring Boot
@@ -20,7 +27,9 @@
 - Nginx
 - APNs (Pushy)
 
-## Architecture
+---
+
+## 🏗 Architecture
 
 ```text
 iOS App
@@ -34,7 +43,9 @@ Spring Boot
 PostgreSQL
 ```
 
-## Project Structure
+---
+
+## 📂 Project Structure
 
 ```text
 .
@@ -59,7 +70,7 @@ PostgreSQL
         └── security
 ```
 
-프로젝트는 도메인 중심으로 구성되어 있습니다.
+프로젝트는 **도메인 중심(Domain-Driven)** 구조로 구성되어 있습니다.
 
 - `domain`: 도메인별 비즈니스 로직
 - `global`: 프로젝트 전역 공통 모듈
@@ -68,10 +79,7 @@ PostgreSQL
 
 ---
 
-## Current Version
+## 📝 Version
 
-- `v1.0.0`
-
-## Version
-
-버전별 변경 사항은 [`CHANGELOG.md`](./CHANGELOG.md)에서 관리합니다.
+- Current Version: `v1.0.0`
+- Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
