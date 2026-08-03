@@ -1,0 +1,160 @@
+package com.seoltangmyo.sugarcat.domain.user.entity;
+
+import com.seoltangmyo.sugarcat.domain.cat.entity.Cat;
+import com.seoltangmyo.sugarcat.global.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+
+@Entity
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uq_users_provider_provider_id",
+                        columnNames = {"provider", "provider_id"}
+                )
+        }
+)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cat_id")
+    private Cat cat;
+
+    @Column(name = "nickname", length = 50)
+    private String nickname;
+
+    @Column(name = "insulin_notification_enabled", nullable = false)
+    private boolean insulinNotiEnabled;
+
+    @Column(name = "blood_sugar_notification_enabled", nullable = false)
+    private boolean bloodSugarNotiEnabled;
+
+    @Column(name = "meal_notification_enabled", nullable = false)
+    private boolean mealNotiEnabled;
+
+    @Column(name = "weekly_report_notification_enabled", nullable = false)
+    private boolean weeklyReportNotificationEnabled;
+
+    @Column(name = "onboarding_completed", nullable = false)
+    private boolean onboardingCompleted;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", nullable = false, length = 20)
+    private ProviderType provider;
+
+    @Column(name = "provider_id", nullable = false, length = 100)
+    private String providerId;
+
+    @Column(name = "refresh_token", length = 500)
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expires_at")
+    private Instant refreshTokenExpiresAt;
+
+    @Column(name = "apns_device_token", length = 500)
+    private String apnsDeviceToken;
+
+    @Column(name = "apns_token_active", nullable = false)
+    private boolean apnsTokenActive;
+
+
+    // 비즈니스 메서드
+
+    public void updateRefreshToken(String refreshToken, Instant expiresAt) {
+        this.refreshToken = refreshToken;
+        this.refreshTokenExpiresAt = expiresAt;
+    }
+
+    public void clearRefreshToken() {
+        this.refreshToken = null;
+        this.refreshTokenExpiresAt = null;
+    }
+
+    public static User createSocialUser(ProviderType provider, String providerId) {
+        User user = new User();
+
+        user.provider = provider;
+        user.providerId = providerId;
+
+        user.insulinNotiEnabled = false;
+        user.bloodSugarNotiEnabled = false;
+        user.mealNotiEnabled = false;
+        user.weeklyReportNotificationEnabled = false;
+
+        user.onboardingCompleted = false;
+        user.apnsTokenActive = false;
+
+        return user;
+    }
+  
+    public void completeOnboarding() {
+        this.onboardingCompleted = true;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void assignCat(Cat cat) {
+        this.cat = cat;
+    }
+
+    public void updateNotification(boolean enabled) {
+        this.insulinNotiEnabled = enabled;
+        this.bloodSugarNotiEnabled = enabled;
+        this.mealNotiEnabled = enabled;
+        this.weeklyReportNotificationEnabled = enabled;
+    }
+
+    // 알림 개별 수정 (PATCH /api/v1/users/me/notification?type={type})
+    // type: insulin / blood / meal / weekly
+    public void updateSingleNotification(String type, boolean enabled) {
+        switch (type) {
+            case "insulin" -> this.insulinNotiEnabled = enabled;
+            case "blood"   -> this.bloodSugarNotiEnabled = enabled;
+            case "meal"    -> this.mealNotiEnabled = enabled;
+            case "weekly"  -> this.weeklyReportNotificationEnabled = enabled;
+            default -> throw new IllegalArgumentException("알 수 없는 알림 타입입니다: " + type);
+        }
+    }
+
+    // 고양이 연결 해제 (고양이 삭제 시 연결된 사용자 cat 참조 null 처리)
+    public void detachCat() {
+        this.cat = null;
+    }
+
+    public void updateApnsDeviceToken(String apnsDeviceToken) {
+        this.apnsDeviceToken = apnsDeviceToken;
+        this.apnsTokenActive = true;
+    }
+
+    public void deactivateApnsToken() {
+        this.apnsTokenActive = false;
+    }
+
+    // 알림 허용 판단
+    public boolean canReceiveInsulinNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && insulinNotiEnabled;
+    }
+
+    public boolean canReceiveBloodSugarNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && bloodSugarNotiEnabled;
+    }
+
+    public boolean canReceiveMealNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && mealNotiEnabled;
+    }
+
+    public boolean canReceiveWeeklyReportNotification() {
+        return apnsTokenActive && apnsDeviceToken != null && weeklyReportNotificationEnabled;
+    }
+}

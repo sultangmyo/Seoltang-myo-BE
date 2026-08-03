@@ -3,23 +3,35 @@ spring:
     name: sugarcat
 
   profiles:
-    active: local
-    include: secret
+    default: local
+    group:
+      prod:
+        - secret
+      local:
+        - secret
 
-  # JPA 공통
   jpa:
     open-in-view: false
     properties:
       hibernate:
         format_sql: true
+        highlight_sql: true
         default_batch_fetch_size: 100
 
-# 서버 설정
-server:
-  port: 8080
+  cache:
+    type: caffeine
+    cache-names:
+      - onboardingStatus
+      - userMe
+      - userNotificationSettings
+      - catInfo
+      - careSchedules
+      - dailyInsulinRecords
+      - dailyBloodSugarRecords
+      - dailyMealRecords
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=30m
 
-# 로깅
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
+server:
+  address: 0.0.0.0
+  port: 8080

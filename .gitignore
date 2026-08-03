@@ -40,3 +40,15 @@ out/
 .DS_Store
 .AppleDouble
 .LSOverride
+
+### env ###
+.env
+.env.*
+!.env.example
+
+### APNs / Apple Key ###
+*.p8
+**/secrets/
+
+### study ###
+**/.study/

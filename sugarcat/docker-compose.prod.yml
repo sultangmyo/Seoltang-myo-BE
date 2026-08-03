@@ -1,0 +1,40 @@
+services:
+  app:
+    image: ${APP_IMAGE}
+    container_name: sugarcat-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./secrets:/app/secrets:ro
+    networks:
+      - app-net
+
+  postgres:
+    image: postgres:16
+    container_name: sugarcat-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app-net
+
+volumes:
+  postgres_data:
+
+networks:
+  app-net:

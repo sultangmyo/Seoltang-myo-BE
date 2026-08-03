@@ -1,0 +1,118 @@
+name: Deploy Sugarcat Server
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  IMAGE_VERSION: v1.0.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # GitHub 저장소 코드 가져오기
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Java 17 설치
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # gradlew 실행 권한 부여
+      - name: Grant execute permission
+        working-directory: ./sugarcat
+        run: chmod +x gradlew
+
+      # 테스트를 제외하고 Spring Boot 빌드
+      - name: Build application
+        working-directory: ./sugarcat
+        run: ./gradlew clean build -x test
+
+      # AWS 인증
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Amazon ECR 로그인
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # v1.0.0, latest 태그로 이미지 빌드 및 Push
+      - name: Build and push Docker image
+        working-directory: ./sugarcat
+        run: |
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}"
+
+          docker build \
+            --platform linux/amd64 \
+            -t "${IMAGE}:${IMAGE_VERSION}" \
+            -t "${IMAGE}:latest" \
+            .
+
+          docker push "${IMAGE}:${IMAGE_VERSION}"
+          docker push "${IMAGE}:latest"
+
+      # EC2 SSH 키 설정
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/sugarcat-key.pem
+          chmod 600 ~/.ssh/sugarcat-key.pem
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+      # EC2에서 latest 이미지로 앱만 재배포
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/sugarcat-key.pem \
+            "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" << EOF
+              set -e
+
+              cd /home/ubuntu/sugarcat
+
+              ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+              aws ecr get-login-password --region "${AWS_REGION}" \
+                | docker login \
+                    --username AWS \
+                    --password-stdin "\${ECR_REGISTRY}"
+
+              docker compose \
+                --env-file .env.prod \
+                -f docker-compose.prod.yml \
+                pull sugarcat-app
+
+              docker compose \
+                --env-file .env.prod \
+                -f docker-compose.prod.yml \
+                up -d --no-deps sugarcat-app
+
+              docker image prune -f
+          EOF
+
+      # 200 또는 인증이 필요한 401이면 정상 처리
+      - name: Health check
+        run: |
+          sleep 15
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://api.sugarcat.site)
+
+          if [ "$STATUS" = "200" ] || [ "$STATUS" = "401" ]; then
+            echo "Server is responding normally: HTTP $STATUS"
+          else
+            echo "Health check failed: HTTP $STATUS"
+            exit 1
+          fi

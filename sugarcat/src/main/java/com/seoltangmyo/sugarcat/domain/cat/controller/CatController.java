@@ -1,0 +1,145 @@
+package com.seoltangmyo.sugarcat.domain.cat.controller;
+
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatExportResponse;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatExportService;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatCreateRequest;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.CatInfoUpdateRequest;
+import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeResponse;
+import com.seoltangmyo.sugarcat.domain.cat.dto.InviteCodeValidateResponse;
+import com.seoltangmyo.sugarcat.domain.cat.service.CatService;
+import com.seoltangmyo.sugarcat.domain.user.dto.MessageResponse;
+import com.seoltangmyo.sugarcat.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Tag(name = "Cat", description = "고양이 API")
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/cats")
+@RequiredArgsConstructor
+public class CatController {
+
+    private final CatExportService catExportService;
+    private final CatService catService;
+
+    // 고양이 기본 정보 조회
+    // GET /api/v1/cats/me
+    // [추가: meaningGitt] 홈뷰 헤더용 고양이 이름 · 진단일 반환
+    @Operation(summary = "고양이 기본 정보 조회")
+    @GetMapping("/me")
+    public ResponseEntity<CatInfoResponse> getCatInfo(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        return ResponseEntity.ok(catService.getCatInfo(userId));
+    }
+
+    // 고양이 기본 정보 수정
+    // PATCH /api/v1/cats/me
+    // [추가: meaningGitt] 마이페이지에서 이름 · 생년월일 · 진단일 수정
+    @Operation(summary = "고양이 기본 정보 수정")
+    @PatchMapping("/me")
+    public ResponseEntity<MessageResponse> updateCatInfo(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody CatInfoUpdateRequest request
+    ) {
+        UUID userId = userDetails.getUserId();
+        return ResponseEntity.ok(catService.updateCatInfo(userId, request));
+    }
+
+    // 초대코드 조회
+    // GET /api/v1/cats/me/invite-code
+    @Operation(summary = "초대코드 조회")
+    @GetMapping("/me/invite-code")
+    public ResponseEntity<InviteCodeResponse> getInviteCode(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        InviteCodeResponse response = catService.getInviteCode(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 초대코드 생성 (재생성)
+    // PATCH /api/v1/cats/me/invite-code
+    @Operation(summary = "초대코드 재생성")
+    @PatchMapping("/me/invite-code")
+    public ResponseEntity<InviteCodeResponse> generateInviteCode(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getUserId();
+        InviteCodeResponse response = catService.generateInviteCode(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 초대코드 유효성 검증 + 공동 집사 합류
+    // PATCH /api/v1/cats/invite?code={inviteCode}
+    // 유효하면 user.catId 저장 후 고양이 정보 반환, 유효하지 않으면 401
+    @Operation(summary = "초대코드 검증 및 공동 집사 합류")
+    @PatchMapping("/invite")
+    public ResponseEntity<InviteCodeValidateResponse> validateInviteCode(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("code") String inviteCode
+    ) {
+        UUID userId = userDetails.getUserId();
+        InviteCodeValidateResponse response = catService.validateInviteCode(userId, inviteCode);
+        return ResponseEntity.ok(response);
+    }
+
+    // 고양이 신규 등록
+    // POST /api/v1/cats
+    // 온보딩 3-A 단계: 신규 고양이 정보 + 루틴 스케줄 한 번에 저장
+    @Operation(summary = "고양이 신규 등록", description = "온보딩 3-A 단계: 신규 고양이 정보 + 루틴 스케줄 한 번에 저장")
+    @PostMapping
+    public ResponseEntity<MessageResponse> createCat(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody CatCreateRequest request
+    ) {
+        log.info("##log## 고양이등록 컨트롤러 - request = {}", request);
+        log.info("##log## 고양이등록 컨트롤러 - cat null 여부 = {}", request.cat() == null);
+
+        UUID userId = userDetails.getUserId();
+        MessageResponse response = catService.createCat(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @Operation(summary = "기록 내보내기", description = "기간별 혈당/인슐린/식사 기록 전체 조회")
+    @GetMapping("/me/export")
+    public ResponseEntity<CatExportResponse> exportRecords(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @RequestParam("startDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam("endDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        UUID userId = userDetails.getUserId();
+
+        CatExportResponse response =
+                catExportService.exportRecords(userId, startDate, endDate);
+
+        return ResponseEntity.ok(response);
+    }
+}
