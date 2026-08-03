@@ -24,14 +24,15 @@
 
 ---
 
-## [1.0.0] - 2026-07-26
+## [1.0.0] - 2026-08-03
 
 ### ✨ Added
 
 - Initial production release
 - APNs Production 지원
-- Docker / ECR 운영 환경 구성
+- Docker / Amazon ECR 운영 환경 구성
 - Docker 이미지 버전 관리 적용
+- GitHub Actions 기반 CI/CD 자동 배포
 
 ### 🗄 Database
 
