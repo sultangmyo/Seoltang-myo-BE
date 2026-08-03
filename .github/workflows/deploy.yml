@@ -102,12 +102,12 @@ jobs:
               docker compose \
                 --env-file .env.prod \
                 -f docker-compose.prod.yml \
-                pull sugarcat-app
+                pull app
 
               docker compose \
                 --env-file .env.prod \
                 -f docker-compose.prod.yml \
-                up -d --no-deps sugarcat-app
+                up -d --no-deps app
 
               docker image prune -f
           EOF
