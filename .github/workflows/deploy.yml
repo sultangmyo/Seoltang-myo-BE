@@ -69,9 +69,19 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/sugarcat-key.pem
+
+          printf '%s' "${{ secrets.EC2_SSH_KEY_BASE64 }}" \
+            | base64 --decode \
+            > ~/.ssh/sugarcat-key.pem
+
           chmod 600 ~/.ssh/sugarcat-key.pem
-          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+          ssh-keygen -y \
+            -f ~/.ssh/sugarcat-key.pem \
+            > /dev/null
+
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" \
+            >> ~/.ssh/known_hosts
 
       # EC2에서 latest 이미지로 앱만 재배포
       - name: Deploy to EC2
