@@ -115,7 +115,7 @@ jobs:
       # 200 또는 인증이 필요한 401이면 정상 처리
       - name: Health check
         run: |
-          sleep 15
+          sleep 30
 
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             https://api.sugarcat.site)
