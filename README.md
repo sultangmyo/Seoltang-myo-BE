@@ -1,6 +1,9 @@
-# Sugarcat Server
-
+# Seoltang-myo-BE
 **설탕묘** 서비스의 Spring Boot Backend Server입니다.
+- **App Store**: https://apps.apple.com/kr/app/id6793892163
+- **Frontend Repository**: https://github.com/sultangmyo/Seoltang-myo-FE
+
+---
 
 ## 📌 Overview
 
@@ -31,17 +34,8 @@
 
 ## 🏗 Architecture
 
-```text
-iOS App
-    │
- HTTPS
-    │
- Nginx
-    │
-Spring Boot
-    │
-PostgreSQL
-```
+<img width="3400" height="2324" alt="설탕묘 시스템 아키텍처_400dpi" src="https://github.com/user-attachments/assets/0dff4bf8-7249-41f8-b479-63dbf2b0c480" />
+
 
 ---
 
