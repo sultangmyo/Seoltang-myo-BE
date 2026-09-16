@@ -49,9 +49,26 @@ services:
     networks:
       - app-net
 
+  grafana:
+    image: grafana/grafana:13.2.1
+    container_name: sugarcat-grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    env_file:
+      - .env.local
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - app-net
+
 volumes:
   postgres_data:
   prometheus_data:
+  grafana_data:
 
 networks:
   app-net:
