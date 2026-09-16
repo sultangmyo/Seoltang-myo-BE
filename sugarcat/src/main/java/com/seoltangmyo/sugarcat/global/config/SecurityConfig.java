@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/apple", "/api/v1/auth/kakao", "/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/notices/active").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .anyRequest().authenticated() // 로그아웃과 나머지 api는 인증필수
                 )
