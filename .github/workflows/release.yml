@@ -1,0 +1,51 @@
+name: Release Sugarcat Server
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Git tag가 가리키는 commit 정보를 사용하기 위해 checkout한다.
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # AWS에 접근하기 위한 인증 정보를 설정한다.
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Amazon ECR에 로그인한다.
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 이미 main에서 빌드·검증한 동일 이미지를 Release 버전으로 승격한다.
+      - name: Promote image to release version
+        run: |
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}"
+
+          RELEASE_TAG="${GITHUB_REF_NAME}"
+          COMMIT_TAG="sha-${GITHUB_SHA}"
+
+          echo "Promoting ${COMMIT_TAG} to ${RELEASE_TAG}"
+
+          docker pull "${IMAGE}:${COMMIT_TAG}"
+
+          docker tag \
+            "${IMAGE}:${COMMIT_TAG}" \
+            "${IMAGE}:${RELEASE_TAG}"
+
+          docker push "${IMAGE}:${RELEASE_TAG}"
