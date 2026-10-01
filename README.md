@@ -1,6 +1,10 @@
-# Sugarcat Server
-
+# Seoltang-myo-BE
 **설탕묘** 서비스의 Spring Boot Backend Server입니다.
+
+- **App Store**: https://apps.apple.com/kr/app/id6793892163
+- **Frontend Repository**: https://github.com/sultangmyo/Seoltang-myo-FE
+
+---
 
 ## 📌 Overview
 
@@ -17,31 +21,32 @@
 
 ## 🛠 Tech Stack
 
-- Java 21
+### Backend
+- Java 17
 - Spring Boot
 - Spring Security
 - Spring Data JPA
 - PostgreSQL 16
+
+### Infrastructure
 - Docker / Docker Compose
 - AWS EC2 / ECR
 - Nginx
+
+### Monitoring
+- Spring Boot Actuator
+- Micrometer
+- Prometheus
+- Grafana
+
+### External Service
 - APNs (Pushy)
 
 ---
 
 ## 🏗 Architecture
 
-```text
-iOS App
-    │
- HTTPS
-    │
- Nginx
-    │
-Spring Boot
-    │
-PostgreSQL
-```
+<img width="3400" height="2324" alt="설탕묘 시스템 아키텍처_400dpi" src="https://github.com/user-attachments/assets/8e867891-5954-4167-b556-447076322f7d" />
 
 ---
 
@@ -81,5 +86,5 @@ PostgreSQL
 
 ## 📝 Version
 
-- Current Version: `v1.0.0`
+- Current Version: `v1.1.0`
 - Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
