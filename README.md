@@ -86,5 +86,5 @@
 
 ## 📝 Version
 
-- Current Version: `v1.1.0`
+- Current Version: `v1.0.0`
 - Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
