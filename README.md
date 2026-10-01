@@ -46,7 +46,7 @@
 
 ## 🏗 Architecture
 
-<img width="3400" height="2324" alt="설탕묘 시스템 아키텍처" src="https://github.com/user-attachments/assets/0dff4bf8-7249-41f8-b479-63dbf2b0c480" />
+<img width="3400" height="2324" alt="설탕묘 시스템 아키텍처_400dpi" src="https://github.com/user-attachments/assets/8e867891-5954-4167-b556-447076322f7d" />
 
 ---
 
