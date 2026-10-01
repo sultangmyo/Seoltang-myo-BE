@@ -24,6 +24,22 @@
 
 ---
 
+## [1.1.0] - 2026-10-01
+
+### ✨ Added
+
+- Spring Boot Actuator 기반 애플리케이션 상태 및 메트릭 수집
+- Prometheus / Grafana 기반 서버 모니터링 환경 구축
+- JVM, HTTP 요청, DB Connection Pool 등 주요 지표 모니터링
+
+### 🔄 Changed
+
+- Docker Compose에 Prometheus / Grafana 서비스 추가
+- Git commit SHA 기반 Docker 이미지 관리 및 릴리스 버전 관리 개선
+- 문서 변경 시 불필요한 자동 배포 제외
+
+---
+
 ## [1.0.0] - 2026-07-26
 
 ### ✨ Added
